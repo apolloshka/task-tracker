@@ -1,9 +1,14 @@
 package domain;
 
 public class Task {
-    private String id;
+    private int id;
     private String title;
     private String description;
+
+    public Task(String title, String description){
+        this.title = title;
+        this.description = description;
+    }
 
     public String getTitle(){
         return title;
@@ -19,5 +24,13 @@ public class Task {
 
     public void setDescription(String description){
         this.description = description;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }
