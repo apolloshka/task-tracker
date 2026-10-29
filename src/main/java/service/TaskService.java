@@ -1,69 +1,116 @@
+
 package service;
 
-import domain.Task;
+import model.Task;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TaskService {
-    private Task[] tasks;
-    private int size = 0;
+
+    private final List<Task> tasks;
     private int id = 1;
 
-    public TaskService(){
-        tasks = new Task[1];
+    public TaskService() {
+        tasks = new ArrayList<>();
     }
 
-    public boolean addTask(Task newTask){
-        if (size == tasks.length) {
-            newCapacity();
-        }
-        newTask.setId(id);
-        id++;
-        tasks[size] = newTask;
-        size++;
-        return true;
-    }
-
-    public boolean deleteTask(int id){
-        int numForDelete = findTaskIdToDelete(id);
-
-        if (numForDelete < 0){
+    public boolean addTask(Task newTask) {
+        if (newTask.getTitle() == null || newTask.getTitle().isEmpty()) {
             return false;
         }
-        for (int i = numForDelete; i < size - 1; i++){
-            tasks[i] = tasks[i+1];
-        }
-        tasks[size - 1] = null;
-        size --;
+
+        newTask.setId(id);
+        id++;
+        tasks.add(newTask);
+
         return true;
     }
 
-    private int findTaskIdToDelete(int id){
-        int numForDelete = -1;
+    public boolean deleteTask(int id) {
+        for (int i = 0; i < tasks.size(); i++) {
+            Task task = tasks.get(i);
 
-        for (int i = 0; i < size; i++){
-            if (tasks[i].getId() == id){
-                numForDelete = i;
-                return numForDelete;
+            if (task.getId() == id) {
+                tasks.remove(i);
+                return true;
             }
         }
-        return numForDelete;
+
+        return false;
     }
 
-    private void newCapacity(){
-        Task[] biggerTasks = new Task[tasks.length * 2];
+    //TODO подумать как оповестить пользака что он меняет значение N на значение N
+    public boolean updateTask(
+            int id,
+            String newTitle,
+            String newDescription) {
 
-        for (int i = 0; i < tasks.length; i++) {
-            biggerTasks[i] = tasks[i];
-        }
-        tasks = biggerTasks;
-    }
+        Task task = findTaskById(id);
 
-    public Task[] getAllTasks(){
-        Task[] result = new Task[size];
-
-        for (int i = 0; i < size; i++){
-            result[i] = tasks[i];
+        if (task == null) {
+            return false;
         }
 
-        return result;
+        if (newTitle == null && newDescription == null) {
+            return false;
+        }
+
+        if (newTitle != null && newTitle.isEmpty()) {
+            return false;
+        }
+
+        if (newDescription != null &&
+                newDescription.isEmpty()) {
+            return false;
+        }
+
+        if (newTitle != null) {
+            task.setTitle(newTitle);
+        }
+
+        if (newDescription != null) {
+            task.setDescription(newDescription);
+        }
+
+        return true;
     }
+
+    public Task findTaskById(int id) {
+        for (Task task : tasks) {
+            if (task.getId() == id) {
+                return task;
+            }
+        }
+        return null;
+    }
+
+    public List<Task> findTasksByTitle(String title) {
+        List<Task> foundTasks = new ArrayList<>();
+
+        for (Task task : tasks) {
+
+            if (task.getTitle().contains(title)) {
+                foundTasks.add(task);
+            }
+        }
+        return foundTasks;
+    }
+
+    public List<Task> getAllTasks() {
+        return new ArrayList<>(tasks);
+    }
+
+    public void loadTasks(List<Task> loadedTasks) {
+        id = 1;
+
+        for (Task task : loadedTasks) {
+            tasks.add(task);
+
+            if (task.getId() >= id) {
+                id = task.getId() + 1;
+            }
+        }
+    }
+
 }
