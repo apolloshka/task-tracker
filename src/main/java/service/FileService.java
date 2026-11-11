@@ -17,19 +17,17 @@ public class FileService {
 
     public void saveTasks(List<Task> tasks) throws IOException {
 
-        FileWriter writer = new FileWriter("tasks.txt"); //открытие файла или создание если его не существует
-        PrintWriter pw = new PrintWriter(writer); //принтер, запись в файл
+        try (PrintWriter pw = new PrintWriter(new FileWriter("tasks.txt"))) {
 
-        for (Task task : tasks) {
-            pw.println(task.getId());
-            pw.println(task.getTitle());
-            pw.println(task.getDescription());
-        }
+            for (Task task : tasks) {
+                pw.println(task.getId());
+                pw.println(task.getTitle());
+                pw.println(task.getDescription());
+            }
 
-        pw.close();
-
-        if (pw.checkError()) {
-            throw new IOException("Не удалось записать задачи");
+            if (pw.checkError()) {
+                throw new IOException("Не удалось записать задачи");
+            }
         }
     }
 
@@ -42,24 +40,22 @@ public class FileService {
             return tasks;
         }
 
-        FileReader reader = new FileReader(file); //открытие файла для чтения
-        BufferedReader br = new BufferedReader(reader); //построчное чтение файла
-        String line = br.readLine();
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
 
-        while (line != null) {
-            int id = Integer.parseInt(line);
-            String title = br.readLine();
-            String description = br.readLine();
+            String line = br.readLine();
 
-            Task task = new Task(title, description);
-            task.setId(id);
-            tasks.add(task);
+            while (line != null) {
+                int id = Integer.parseInt(line);
+                String title = br.readLine();
+                String description = br.readLine();
 
-            line = br.readLine();
+                Task task = new Task(title, description);
+                task.setId(id);
+                tasks.add(task);
+
+                line = br.readLine();
+            }
+            return tasks;
         }
-
-        br.close();
-        return tasks;
-
     }
 }

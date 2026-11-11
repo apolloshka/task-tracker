@@ -1,6 +1,11 @@
 package service;
 
+import exception.InvalidTaskException;
+import exception.TaskNotFoundException;
 import model.Task;
+
+import static CONSTANTS.UpdateConstants.TITLE;
+import static CONSTANTS.UpdateConstants.DESCRIPTION;
 
 import java.io.IOException;
 import java.util.List;
@@ -21,7 +26,7 @@ public class ConsoleService {
         this.fileService = fileService;
     }
 
-    public void run() throws IOException {
+    public void run() {
         boolean running = true;
 
         while (running) {
@@ -79,7 +84,7 @@ public class ConsoleService {
 
     }
 
-    private void createTask() throws IOException {
+    private void createTask() {
         printService.printEnterTaskTitle();
         String title = inputService.readString();
 
@@ -88,17 +93,18 @@ public class ConsoleService {
 
         Task task = new Task(title, description);
 
-        boolean added = taskService.addTask(task);
-
-        if (added) {
+        try {
+            taskService.addTask(task);
             fileService.saveTasks(taskService.getAllTasks());
             printService.printMessage("Задача добавлена");
-        } else {
-            printService.printMessage("Не удалось добавить задачу");
+        } catch (InvalidTaskException e) {
+            printService.printMessage(e.getMessage());
+        } catch (IOException e) {
+            printService.printMessage("Не удалось сохранить задачу в файл");
         }
     }
 
-    private void deleteTask() throws IOException {
+    private void deleteTask() {
         List<Task> allTasks = taskService.getAllTasks();
 
         if (allTasks.isEmpty()) {
@@ -111,12 +117,14 @@ public class ConsoleService {
 
         int numId = inputService.readInt();
 
-        if (taskService.deleteTask(numId)) {
+        try {
+            taskService.deleteTask(numId);
             fileService.saveTasks(taskService.getAllTasks());
-
-            printService.printMessage("Задача с Id = " + numId + " удалена");
-        } else {
-            printService.printMessage("Задача с Id = " + numId + " не найдена");
+            printService.printMessage("Задача с Id " + numId + " удалена");
+        } catch (TaskNotFoundException e) {
+            printService.printMessage(e.getMessage());
+        } catch (IOException e) {
+            printService.printMessage("Не удалось удалить задачу из файла");
         }
     }
 
@@ -125,12 +133,11 @@ public class ConsoleService {
 
         int id = inputService.readInt();
 
-        Task task = taskService.findTaskById(id);
-
-        if (task != null) {
+        try {
+            Task task = taskService.findTaskById(id);
             printService.printTask(task);
-        } else {
-            printService.printMessage("Задача с таким Id не найдена");
+        } catch (TaskNotFoundException e) {
+            printService.printMessage(e.getMessage());
         }
     }
 
@@ -140,21 +147,20 @@ public class ConsoleService {
 
         String title = inputService.readString();
 
-        while (title.isBlank()) {
-            printService.printMessage("Пустое значение. Введите название задачи: ");
-            title = inputService.readString();
-        }
+        try {
+            List<Task> foundTasks = taskService.findTasksByTitle(title);
 
-        List<Task> foundTasks = taskService.findTasksByTitle(title);
-
-        if (foundTasks.isEmpty()) {
-            printService.printMessage("Задачи с таким названием не найдены");
-        } else {
-            printService.printAllTasks(foundTasks);
+            if (foundTasks.isEmpty()) {
+                printService.printMessage("Задачи с таким названием не найдены");
+            } else {
+                printService.printAllTasks(foundTasks);
+            }
+        } catch (InvalidTaskException e) {
+            printService.printMessage(e.getMessage());
         }
     }
 
-    private void updateTask() throws IOException {
+    private void updateTask() {
         List<Task> allTasks = taskService.getAllTasks();
 
         if (allTasks.isEmpty()) {
@@ -166,39 +172,48 @@ public class ConsoleService {
         printService.printEnterTaskIdToUpdate();
 
         int numId = inputService.readInt();
-
-        if (taskService.findTaskById(numId) == null) {
-            printService.printMessage("Задача с таким Id не найдена");
-            return;
-        }
-
         printService.printUpdateMenu();
-
         int num = inputService.readInt();
 
-        String newTitle = null;
-        String newDescription = null;
-
-        if (num == 1) {
-            printService.printMessage("Введите новое название:");
-            newTitle = inputService.readString();
-
-        } else if (num == 2) {
-            printService.printMessage("Введите новое описание:");
-            newDescription = inputService.readString();
-
-        } else {
+        if (num != TITLE && num != DESCRIPTION) {
             printService.printMessage("Неизвестный вариант");
             return;
         }
 
-        boolean updated = taskService.updateTask(numId, newTitle, newDescription);
+        String value = readTaskUpdateValue(num);
 
-        if (updated) {
+        String newTitle = null;
+        String newDescription = null;
+
+        if (num == TITLE) {
+            newTitle = value;
+
+        } else {
+            newDescription = value;
+        }
+
+        try {
+            taskService.updateTask(numId, newTitle, newDescription);
             fileService.saveTasks(taskService.getAllTasks());
             printService.printMessage("Задача изменена");
-        } else {
-            printService.printMessage("Задача не была изменена");
+        } catch (TaskNotFoundException | InvalidTaskException e) {
+            printService.printMessage(e.getMessage());
+        } catch (IOException e) {
+            printService.printMessage("Не удалось обновить задачу в файле");
         }
     }
+
+    private String readTaskUpdateValue(int num) {
+        if (num == TITLE) {
+            printService.printMessage("Введите новое название:");
+            return inputService.readString();
+
+        } else if (num == DESCRIPTION) {
+            printService.printMessage("Введите новое описание:");
+            return inputService.readString();
+        }
+        return null;
+    }
 }
+
+

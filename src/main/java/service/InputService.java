@@ -14,8 +14,13 @@ public class InputService {
     }
 
     public int readInt() {
-        int number = scanner.nextInt();
-        scanner.nextLine();
-        return number;
+        while (true) {
+            String number = scanner.nextLine();
+            try {
+                return Integer.parseInt(number);
+            } catch (NumberFormatException e) {
+                System.out.println("Введите число: ");
+            }
+        }
     }
 }

@@ -1,7 +1,9 @@
 
 package service;
 
+import exception.InvalidTaskException;
 import model.Task;
+import exception.TaskNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,54 +17,39 @@ public class TaskService {
         tasks = new ArrayList<>();
     }
 
-    public boolean addTask(Task newTask) {
-        if (newTask.getTitle() == null || newTask.getTitle().isEmpty()) {
-            return false;
+    public void addTask(Task newTask) {
+        if (newTask.getTitle() == null || newTask.getTitle().isBlank()) {
+            throw new InvalidTaskException("Название задачи не может быть пустым");
         }
 
         newTask.setId(id);
         id++;
         tasks.add(newTask);
-
-        return true;
     }
 
-    public boolean deleteTask(int id) {
-        for (int i = 0; i < tasks.size(); i++) {
-            Task task = tasks.get(i);
-
-            if (task.getId() == id) {
-                tasks.remove(i);
-                return true;
-            }
-        }
-
-        return false;
+    public void deleteTask(int id) {
+        Task task = findTaskById(id);
+        tasks.remove(task);
     }
 
     //TODO подумать как оповестить пользака что он меняет значение N на значение N
-    public boolean updateTask(
+    public void updateTask(
             int id,
             String newTitle,
             String newDescription) {
 
         Task task = findTaskById(id);
 
-        if (task == null) {
-            return false;
-        }
-
         if (newTitle == null && newDescription == null) {
-            return false;
+            throw new InvalidTaskException("Не указаны данные для изменения");
         }
 
-        if (newTitle != null && newTitle.isEmpty()) {
-            return false;
+        if (newTitle != null && newTitle.isBlank()) {
+            throw new InvalidTaskException("Название задачи не может быть пустым");
         }
 
-        if (newDescription != null &&
-                newDescription.isEmpty()) {
-            return false;
+        if (newDescription != null && newDescription.isBlank()) {
+            throw new InvalidTaskException("Описание задачи не может быть пустым");
         }
 
         if (newTitle != null) {
@@ -72,8 +59,6 @@ public class TaskService {
         if (newDescription != null) {
             task.setDescription(newDescription);
         }
-
-        return true;
     }
 
     public Task findTaskById(int id) {
@@ -82,10 +67,15 @@ public class TaskService {
                 return task;
             }
         }
-        return null;
+        throw new TaskNotFoundException(id);
     }
 
     public List<Task> findTasksByTitle(String title) {
+
+        if (title == null || title.isBlank()) {
+            throw new InvalidTaskException("Название для поиска не может быть пустым");
+        }
+
         List<Task> foundTasks = new ArrayList<>();
 
         for (Task task : tasks) {
@@ -112,5 +102,4 @@ public class TaskService {
             }
         }
     }
-
 }

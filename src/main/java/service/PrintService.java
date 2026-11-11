@@ -3,6 +3,10 @@ package service;
 
 import model.Task;
 
+import static CONSTANTS.UpdateConstants.TITLE;
+import static CONSTANTS.UpdateConstants.DESCRIPTION;
+
+
 import java.util.List;
 
 public class PrintService {
@@ -54,8 +58,8 @@ public class PrintService {
 
     public void printUpdateMenu() {
         System.out.println("Что изменить?");
-        System.out.println("1 - название");
-        System.out.println("2 - описание");
+        System.out.println(TITLE + " - название");
+        System.out.println(DESCRIPTION + "2 - описание");
     }
 
     public void printTask(Task task) {
