@@ -1,69 +1,105 @@
+
 package service;
 
-import domain.Task;
+import exception.InvalidTaskException;
+import model.Task;
+import exception.TaskNotFoundException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TaskService {
-    private Task[] tasks;
-    private int size = 0;
+
+    private final List<Task> tasks;
     private int id = 1;
 
-    public TaskService(){
-        tasks = new Task[1];
+    public TaskService() {
+        tasks = new ArrayList<>();
     }
 
-    public boolean addTask(Task newTask){
-        if (size == tasks.length) {
-            newCapacity();
+    public void addTask(Task newTask) {
+        if (newTask.getTitle() == null || newTask.getTitle().isBlank()) {
+            throw new InvalidTaskException("Название задачи не может быть пустым");
         }
+
         newTask.setId(id);
         id++;
-        tasks[size] = newTask;
-        size++;
-        return true;
+        tasks.add(newTask);
     }
 
-    public boolean deleteTask(int id){
-        int numForDelete = findTaskIdToDelete(id);
-
-        if (numForDelete < 0){
-            return false;
-        }
-        for (int i = numForDelete; i < size - 1; i++){
-            tasks[i] = tasks[i+1];
-        }
-        tasks[size - 1] = null;
-        size --;
-        return true;
+    public void deleteTask(int id) {
+        Task task = findTaskById(id);
+        tasks.remove(task);
     }
 
-    private int findTaskIdToDelete(int id){
-        int numForDelete = -1;
+    //TODO подумать как оповестить пользака что он меняет значение N на значение N
+    public void updateTask(
+            int id,
+            String newTitle,
+            String newDescription) {
 
-        for (int i = 0; i < size; i++){
-            if (tasks[i].getId() == id){
-                numForDelete = i;
-                return numForDelete;
+        Task task = findTaskById(id);
+
+        if (newTitle == null && newDescription == null) {
+            throw new InvalidTaskException("Не указаны данные для изменения");
+        }
+
+        if (newTitle != null && newTitle.isBlank()) {
+            throw new InvalidTaskException("Название задачи не может быть пустым");
+        }
+
+        if (newDescription != null && newDescription.isBlank()) {
+            throw new InvalidTaskException("Описание задачи не может быть пустым");
+        }
+
+        if (newTitle != null) {
+            task.setTitle(newTitle);
+        }
+
+        if (newDescription != null) {
+            task.setDescription(newDescription);
+        }
+    }
+
+    public Task findTaskById(int id) {
+        for (Task task : tasks) {
+            if (task.getId() == id) {
+                return task;
             }
         }
-        return numForDelete;
+        throw new TaskNotFoundException(id);
     }
 
-    private void newCapacity(){
-        Task[] biggerTasks = new Task[tasks.length * 2];
+    public List<Task> findTasksByTitle(String title) {
 
-        for (int i = 0; i < tasks.length; i++) {
-            biggerTasks[i] = tasks[i];
+        if (title == null || title.isBlank()) {
+            throw new InvalidTaskException("Название для поиска не может быть пустым");
         }
-        tasks = biggerTasks;
+
+        List<Task> foundTasks = new ArrayList<>();
+
+        for (Task task : tasks) {
+
+            if (task.getTitle().contains(title)) {
+                foundTasks.add(task);
+            }
+        }
+        return foundTasks;
     }
 
-    public Task[] getAllTasks(){
-        Task[] result = new Task[size];
+    public List<Task> getAllTasks() {
+        return new ArrayList<>(tasks);
+    }
 
-        for (int i = 0; i < size; i++){
-            result[i] = tasks[i];
+    public void loadTasks(List<Task> loadedTasks) {
+        id = 1;
+
+        for (Task task : loadedTasks) {
+            tasks.add(task);
+
+            if (task.getId() >= id) {
+                id = task.getId() + 1;
+            }
         }
-
-        return result;
     }
 }
