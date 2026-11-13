@@ -1,7 +1,7 @@
 
 package service;
 
-import exception.InvalidTaskException;
+import exception.InvalidElementException;
 import model.Task;
 import exception.TaskNotFoundException;
 
@@ -19,7 +19,7 @@ public class TaskService {
 
     public void addTask(Task newTask) {
         if (newTask.getTitle() == null || newTask.getTitle().isBlank()) {
-            throw new InvalidTaskException("Название задачи не может быть пустым");
+            throw new InvalidElementException("Название задачи не может быть пустым");
         }
 
         newTask.setId(id);
@@ -41,15 +41,15 @@ public class TaskService {
         Task task = findTaskById(id);
 
         if (newTitle == null && newDescription == null) {
-            throw new InvalidTaskException("Не указаны данные для изменения");
+            throw new InvalidElementException("Не указаны данные для изменения");
         }
 
         if (newTitle != null && newTitle.isBlank()) {
-            throw new InvalidTaskException("Название задачи не может быть пустым");
+            throw new InvalidElementException("Название задачи не может быть пустым");
         }
 
         if (newDescription != null && newDescription.isBlank()) {
-            throw new InvalidTaskException("Описание задачи не может быть пустым");
+            throw new InvalidElementException("Описание задачи не может быть пустым");
         }
 
         if (newTitle != null) {
@@ -73,7 +73,7 @@ public class TaskService {
     public List<Task> findTasksByTitle(String title) {
 
         if (title == null || title.isBlank()) {
-            throw new InvalidTaskException("Название для поиска не может быть пустым");
+            throw new InvalidElementException("Название для поиска не может быть пустым");
         }
 
         List<Task> foundTasks = new ArrayList<>();
