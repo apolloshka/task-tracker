@@ -1,9 +1,6 @@
 package enums;
 
-import java.util.Arrays;
-import java.util.List;
-
-public enum RelationType {
+public enum RelationTypeEnum {
     FEATURE_STORY,
     STORY_TASK,
     STORY_DEFECT,

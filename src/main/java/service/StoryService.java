@@ -3,7 +3,10 @@ package service;
 import exception.InvalidElementException;
 import exception.StoryNotFoundException;
 import model.Story;
+import model.Task;
+import storage.JsonStoryStorage;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,8 +14,12 @@ public class StoryService {
     private final List<Story> stories;
     private int id = 1;
 
-    public StoryService() {
+    private JsonStoryStorage jsonStoryStorage;
+
+    public StoryService(JsonStoryStorage jsonStoryStorage) {
+
         stories = new ArrayList<>();
+        this.jsonStoryStorage = jsonStoryStorage;
     }
 
     public void addStory(Story newStory) {
@@ -87,5 +94,21 @@ public class StoryService {
 
     public List<Story> getAllStories() {
         return new ArrayList<>(stories);
+    }
+
+    public void saveStoryToJson(List<Story> stories) throws IOException {
+        jsonStoryStorage.saveStories(stories);
+    }
+
+    public void getStoryFromJson(List<Story> loadStories) throws IOException {
+        id = 1;
+
+        for (Story story : loadStories) {
+            stories.add(story);
+
+            if (story.getId() >= id) {
+                id = story.getId() + 1;
+            }
+        }
     }
 }

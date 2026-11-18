@@ -1,6 +1,6 @@
-package CONSTANTS;
+package constants;
 
-public class UpdateConstants {
+public class UpdateElements {
     public static final int TITLE = 1;
     public static final int DESCRIPTION = 2;
 }

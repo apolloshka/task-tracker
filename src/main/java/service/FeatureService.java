@@ -5,7 +5,11 @@ import exception.FeatureNotFoundException;
 import exception.InvalidElementException;
 import model.Defect;
 import model.Feature;
+import model.Story;
+import storage.JsonFeatureStorage;
+import storage.JsonTaskStorage;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,8 +17,12 @@ public class FeatureService {
     private List<Feature> features;
     private int id = 1;
 
-    public FeatureService() {
+    private JsonFeatureStorage jsonFeatureStorage;
+
+
+    public FeatureService(JsonFeatureStorage jsonFeatureStorage) {
         features = new ArrayList<>();
+        this.jsonFeatureStorage = jsonFeatureStorage;
     }
 
     public void addFeature(Feature newFeature) {
@@ -89,5 +97,21 @@ public class FeatureService {
 
     public List<Feature> getAllFeatures() {
         return new ArrayList<>(features);
+    }
+
+    public void saveFeatureToJson(List<Feature> features) throws IOException {
+        jsonFeatureStorage.saveFeatures(features);
+    }
+
+    public void getFeatureFromJson(List<Feature> loadFeatures) throws IOException {
+        id = 1;
+
+        for (Feature feature : loadFeatures) {
+            features.add(feature);
+
+            if (feature.getId() >= id) {
+                id = feature.getId() + 1;
+            }
+        }
     }
 }

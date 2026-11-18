@@ -2,9 +2,12 @@
 package service;
 
 import exception.InvalidElementException;
+import model.Defect;
 import model.Task;
 import exception.TaskNotFoundException;
+import storage.JsonTaskStorage;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,8 +16,13 @@ public class TaskService {
     private final List<Task> tasks;
     private int id = 1;
 
-    public TaskService() {
+    private JsonTaskStorage jsonTaskStorage;
+
+    public TaskService(JsonTaskStorage jsonTaskStorage) {
+
         tasks = new ArrayList<>();
+        this.jsonTaskStorage = jsonTaskStorage;
+
     }
 
     public void addTask(Task newTask) {
@@ -26,6 +34,7 @@ public class TaskService {
         id++;
         tasks.add(newTask);
     }
+
 
     public void deleteTask(int id) {
         Task task = findTaskById(id);
@@ -91,10 +100,14 @@ public class TaskService {
         return new ArrayList<>(tasks);
     }
 
-    public void loadTasks(List<Task> loadedTasks) {
+    public void saveTaskToJson(List<Task> tasks) throws IOException {
+        jsonTaskStorage.saveTasks(tasks);
+    }
+
+    public void getTaskFromJson(List<Task> loadTasks) throws IOException {
         id = 1;
 
-        for (Task task : loadedTasks) {
+        for (Task task : loadTasks) {
             tasks.add(task);
 
             if (task.getId() >= id) {

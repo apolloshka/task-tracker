@@ -4,8 +4,13 @@ import exception.DefectNotFoundException;
 import exception.InvalidElementException;
 import exception.StoryNotFoundException;
 import model.Defect;
+import model.Element;
 import model.Story;
+import model.Task;
+import storage.JsonDefectStorage;
+import storage.JsonTaskStorage;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,8 +18,13 @@ public class DefectService {
     private List<Defect> defects;
     private int id = 1;
 
-    public DefectService() {
+    private JsonDefectStorage jsonDefectStorage;
+
+
+    public DefectService(JsonDefectStorage jsonDefectStorage) {
+
         defects = new ArrayList<>();
+        this.jsonDefectStorage = jsonDefectStorage;
     }
 
 
@@ -91,4 +101,21 @@ public class DefectService {
     public List<Defect> getAllDefects() {
         return new ArrayList<>(defects);
     }
+
+    public void saveDefectToJson(List<Defect> defects) throws IOException {
+        jsonDefectStorage.saveDefects(defects);
+    }
+
+    public void getDefectFromJson(List<Defect> loadDefects) throws IOException {
+        id = 1;
+
+        for (Defect defect : loadDefects) {
+            defects.add(defect);
+
+            if (defect.getId() >= id) {
+                id = defect.getId() + 1;
+            }
+        }
+    }
 }
+

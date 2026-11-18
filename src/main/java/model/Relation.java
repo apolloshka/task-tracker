@@ -1,24 +1,37 @@
 package model;
 
-import enums.RelationType;
+import enums.RelationTypeEnum;
 
 import java.util.List;
 
 public class Relation {
-    private RelationType type;
+    private int id;
+    private RelationTypeEnum type;
 
     //TODO подумать над названиями полей
 
     private int mainId;
     private int subordinateId;
 
-    public Relation(RelationType type, int mainId, int subordinateId) {
+    public Relation(RelationTypeEnum type, int mainId, int subordinateId) {
         this.type = type;
         this.mainId = mainId;
         this.subordinateId = subordinateId;
     }
 
-    public RelationType getType() {
+    public Relation() {
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+
+    public RelationTypeEnum getType() {
         return type;
     }
 

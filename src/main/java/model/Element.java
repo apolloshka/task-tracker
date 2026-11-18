@@ -2,6 +2,7 @@ package model;
 
 import java.util.List;
 
+
 public abstract class Element {
     private int id;
     private String title;
@@ -10,6 +11,9 @@ public abstract class Element {
     public Element(String title, String description) {
         this.title = title;
         this.description = description;
+    }
+
+    public Element() {
     }
 
     public int getId() {

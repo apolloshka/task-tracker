@@ -1,12 +1,12 @@
 
 package service;
 
-import enums.Models;
-import enums.RelationType;
+import enums.ModelEnum;
+import enums.RelationTypeEnum;
 import model.*;
 
-import static CONSTANTS.UpdateConstants.TITLE;
-import static CONSTANTS.UpdateConstants.DESCRIPTION;
+import static constants.UpdateElements.TITLE;
+import static constants.UpdateElements.DESCRIPTION;
 
 
 import java.util.List;
@@ -93,12 +93,62 @@ public class PrintService {
                 + " Название: " + task.getTitle()
                 + " Описание задачи: " + task.getDescription()
         );
+        System.out.println("Связанные дефекты:");
+
+        for (Defect defect : task.getRelatedDefects()) {
+            printDefectShort(defect);
+        }
+
+        System.out.println("Связанные задачи:");
+
+        for (Task tasks : task.getRelatedTasks()) {
+            printTaskShort(tasks);
+        }
+
+        System.out.println("Связанные истории:");
+
+        for (Story story : task.getRelatedStories()) {
+            printStoryShort(story);
+        }
+
+    }
+
+    private void printTaskShort(Task task) {
+        System.out.println(
+                "Id задачи: " + task.getId()
+                        + " Название: " + task.getTitle()
+        );
     }
 
     public void printStory(Story story) {
         System.out.println("Id истории: " + story.getId()
                 + " Название: " + story.getTitle()
                 + " Описание истории: " + story.getDescription()
+        );
+
+        System.out.println("Связанные дефекты:");
+
+        for (Defect defect : story.getRelatedDefects()) {
+            printDefectShort(defect);
+        }
+
+        System.out.println("Связанные задачи:");
+
+        for (Task task : story.getRelatedTasks()) {
+            printTaskShort(task);
+        }
+
+        System.out.println("Связанные фичи:");
+
+        for (Feature feature : story.getRelatedFeatures()) {
+            printFeatureShort(feature);
+        }
+    }
+
+    private void printStoryShort(Story story) {
+        System.out.println(
+                "Id истории: " + story.getId()
+                        + " Название: " + story.getTitle()
         );
     }
 
@@ -107,6 +157,25 @@ public class PrintService {
                 + " Название: " + defect.getTitle()
                 + " Описание дефекта: " + defect.getDescription()
         );
+
+        System.out.println("Связанные задачи:");
+
+        for (Task task : defect.getRelatedTasks()) {
+            printTaskShort(task);
+        }
+
+        System.out.println("Связанные истории:");
+
+        for (Story story : defect.getRelatedStories()) {
+            printStoryShort(story);
+        }
+    }
+
+    private void printDefectShort(Defect defect) {
+        System.out.println(
+                "Id дефекта: " + defect.getId()
+                        + " Название: " + defect.getTitle()
+        );
     }
 
     public void printFeature(Feature feature) {
@@ -114,14 +183,27 @@ public class PrintService {
                 + " Название: " + feature.getTitle()
                 + " Описание фичи: " + feature.getDescription()
         );
+
+        System.out.println("Связанные истории:");
+
+        for (Story story : feature.getRelatedStories()) {
+            printStoryShort(story);
+        }
     }
 
-    public void printRelationTypes(List<RelationType> types) {
+    private void printFeatureShort(Feature feature) {
+        System.out.println(
+                "Id фичи: " + feature.getId()
+                        + " Название: " + feature.getTitle()
+        );
+    }
+
+    public void printRelationTypes(List<RelationTypeEnum> types) {
         System.out.println("Выберите один из типов связи: " + types);
     }
 
-    public void printModelsTypes(List<Models> models) {
-        System.out.println("Выберите один из типов связи: " + models);
+    public void printModelsTypes(List<ModelEnum> models) {
+        System.out.println("Выберите один из типов моделей: " + models);
     }
 
     public void printEnterRelation() {
