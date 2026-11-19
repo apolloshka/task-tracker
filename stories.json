@@ -1,9 +1,29 @@
 [ {
   "id" : 1,
   "title" : "4",
-  "description" : "4"
+  "description" : "4",
+  "relatedDefects" : [ ],
+  "relatedTasks" : [ ],
+  "relatedFeatures" : [ ]
 }, {
   "id" : 2,
   "title" : "6",
-  "description" : ""
+  "description" : "",
+  "relatedDefects" : [ ],
+  "relatedTasks" : [ ],
+  "relatedFeatures" : [ ]
+}, {
+  "id" : 3,
+  "title" : "новая история",
+  "description" : "",
+  "relatedDefects" : [ ],
+  "relatedTasks" : [ ],
+  "relatedFeatures" : [ ]
+}, {
+  "id" : 4,
+  "title" : "9",
+  "description" : "9",
+  "relatedDefects" : [ ],
+  "relatedTasks" : [ ],
+  "relatedFeatures" : [ ]
 } ]

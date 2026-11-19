@@ -1,41 +1,26 @@
 [ {
-  "id" : 1,
-  "type" : "FEATURE_STORY",
-  "mainId" : 1,
-  "subordinateId" : 1
-}, {
   "id" : 2,
-  "type" : "RELATED_TO",
-  "mainId" : 3,
-  "subordinateId" : 7
+  "type" : "PARENT_TASK",
+  "mainId" : 8,
+  "subordinateId" : 10
 }, {
   "id" : 3,
-  "type" : "DEFECT_FOUND",
-  "mainId" : 2,
-  "subordinateId" : 3
+  "type" : "STORY_DEFECT",
+  "mainId" : 1,
+  "subordinateId" : 4
 }, {
   "id" : 4,
-  "type" : "FIXES_DEFECT",
-  "mainId" : 2,
-  "subordinateId" : 1
+  "type" : "STORY_DEFECT",
+  "mainId" : 4,
+  "subordinateId" : 4
 }, {
   "id" : 5,
-  "type" : "FIXES_DEFECT",
-  "mainId" : 2,
+  "type" : "STORY_DEFECT",
+  "mainId" : 1,
   "subordinateId" : 1
 }, {
   "id" : 6,
   "type" : "FEATURE_STORY",
-  "mainId" : 1,
-  "subordinateId" : 1
-}, {
-  "id" : 7,
-  "type" : "FEATURE_STORY",
-  "mainId" : 1,
-  "subordinateId" : 1
-}, {
-  "id" : 8,
-  "type" : "STORY_TASK",
-  "mainId" : 1,
-  "subordinateId" : 10
+  "mainId" : 2,
+  "subordinateId" : 2
 } ]

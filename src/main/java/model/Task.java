@@ -9,6 +9,7 @@ public class Task extends Element {
     private List<Story> stories = new ArrayList<>();
 
     public Task(String title, String description) {
+
         super(title, description);
     }
 

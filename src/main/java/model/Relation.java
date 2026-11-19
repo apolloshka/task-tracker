@@ -2,8 +2,6 @@ package model;
 
 import enums.RelationTypeEnum;
 
-import java.util.List;
-
 public class Relation {
     private int id;
     private RelationTypeEnum type;
@@ -43,5 +41,11 @@ public class Relation {
         return subordinateId;
     }
 
-    //TODO можем ли мы менять связь? от этого зависит нужны ли setterы
+    public void setMainId(int mainId) {
+        this.mainId = mainId;
+    }
+
+    public void setSubordinateId(int subordinateId) {
+        this.subordinateId = subordinateId;
+    }
 }

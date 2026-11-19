@@ -1,15 +1,13 @@
 
 package service;
 
-import enums.ModelEnum;
 import enums.RelationTypeEnum;
 import model.*;
 
-import static constants.UpdateElements.TITLE;
-import static constants.UpdateElements.DESCRIPTION;
-
 
 import java.util.List;
+
+import static constants.UpdateElements.*;
 
 public class PrintService {
 
@@ -41,6 +39,9 @@ public class PrintService {
         System.out.println("23 - Изменить фичу");
         System.out.println("24 - Найти фичу по Id");
         System.out.println("25 - Найти фичу по названию");
+        System.out.println("26 - Удалить связь");
+        System.out.println("27 - Показать все связи");
+        System.out.println("28 - Изменить связь");
 
 
         System.out.print("Введите команду: ");
@@ -85,6 +86,12 @@ public class PrintService {
         System.out.println("Что изменить?");
         System.out.println(TITLE + " - название");
         System.out.println(DESCRIPTION + " - описание");
+    }
+
+    public void printUpdateRelationMenu() {
+        System.out.println("Что изменить?");
+        System.out.println(MAIN + " - id главного элемента");
+        System.out.println(SUB + " - id зависимого элемента");
     }
 
 
@@ -146,9 +153,8 @@ public class PrintService {
     }
 
     private void printStoryShort(Story story) {
-        System.out.println(
-                "Id истории: " + story.getId()
-                        + " Название: " + story.getTitle()
+        System.out.println("Id истории: " + story.getId()
+                + " Название: " + story.getTitle()
         );
     }
 
@@ -202,28 +208,13 @@ public class PrintService {
         System.out.println("Выберите один из типов связи: " + types);
     }
 
-    public void printModelsTypes(List<ModelEnum> models) {
-        System.out.println("Выберите один из типов моделей: " + models);
-    }
-
     public void printEnterRelation() {
         System.out.println("Тип связи: ");
     }
 
-    public void printEnterModel() {
-        System.out.println("Введите тип элемента который хотите связать: ");
-    }
-
-    public void printEnterMainElement() {
-        System.out.println("Введите id элемента который хотите связать: ");
-    }
-
-    public void printEnterSubordinateElement() {
-        System.out.println("Введите id элемента с которым хотите связать: ");
-    }
-
     public void printRelation(Relation relation) {
-        System.out.println("Тип связи: " + relation.getType()
+        System.out.println("Id связи: " + relation.getId()
+                + " Тип связи: " + relation.getType()
                 + " id основного элемента: " + relation.getMainId()
                 + " id связываемого элемента: " + relation.getSubordinateId()
         );
@@ -278,6 +269,19 @@ public class PrintService {
 
         for (Feature feature : features) {
             printFeature(feature);
+        }
+    }
+
+    public void printAllRelations(List<Relation> relations) {
+        if (relations.isEmpty()) {
+            System.out.println("Список связей пуст");
+            return;
+        }
+
+        System.out.println("Найденные связи:");
+
+        for (Relation relation : relations) {
+            printRelation(relation);
         }
     }
 
