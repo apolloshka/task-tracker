@@ -1,87 +1,60 @@
-import domain.Task;
-import service.TaskService;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import model.*;
+import service.*;
+import storage.*;
+
+import java.io.IOException;
 import java.util.Scanner;
+import java.util.List;
 
 public class Main {
 
     public static void main(String[] args) {
+
         Scanner scanner = new Scanner(System.in);
-
-        TaskService taskService = new TaskService();
-
-        boolean running = true;
-
-        while (running){
-            System.out.println("1 - Создать задачу");
-            System.out.println("2 - Показать все задачи");
-            System.out.println("3 - Удалить задачу");
-            System.out.println("0 - Выход");
-            System.out.println("Введите команду:");
-
-            int command = scanner.nextInt();
-            scanner.nextLine();
-
-            switch(command){
-                case 1:
-                    System.out.println("Введите название:");
-                    String title = scanner.nextLine();
-
-                    System.out.println("Введите описание:");
-                    String description = scanner.nextLine();
-
-                    Task task = new Task(title, description);
-
-                    boolean added = taskService.addTask(task);
-                    if (added){
-                        System.out.println("Задача добавлена");
-                    } else {
-                        break;
-                    }
-                    break;
-
-                case 2:
-                    Task[] allTasks = taskService.getAllTasks();
-
-                    for (int i = 0; i < allTasks.length; i++){
-                            System.out.println("Id задачи: " + (allTasks[i].getId())
-                                    + " Название: " + allTasks[i].getTitle()
-                                    + " Описание задачи: "
-                                    + allTasks[i].getDescription());
-                    }
-                    break;
-
-                case 3:
-                    Task[] allsTasks = taskService.getAllTasks();
-
-                    if (allsTasks.length == 0){
-                        System.out.println("Задач для удаления нет, массив пуст");
-                        break;
-                    }
-                    for (int i = 0; i < allsTasks.length; i++){
-                        System.out.println("Id задачи: " + (allsTasks[i].getId())
-                                + " Название: " + allsTasks[i].getTitle()
-                                + " Описание задачи: "
-                                + allsTasks[i].getDescription());
-                    }
-                    System.out.println("Введите Id задачи, которую хотите удалить: ");
-                    int numId = scanner.nextInt();
-                    if (taskService.deleteTask(numId)){
-                        System.out.println("Задача с Id = " + numId + " удалена из списка");
-                    } else {
-                        System.out.println("Задача с Id = " + numId + " не найдена в списке");
-                    }
-                    break;
+        InputService inputService = new InputService(scanner);
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT); //настройка mapper'а
 
 
-                case 0:
-                    running = false;
-                    break;
+        //TODO применима ли тут какая-нибудь ленивая инициализация? где должны создаваться эти объекты (не main?)
+        PrintService printService = new PrintService();
+//        FileService fileService = new FileService();
+        ModelService modelService = new ModelService();
 
-                default:
-                    System.out.println("Неизвестная команда");
-            }
+        JsonTaskStorage jsonTaskStorage = new JsonTaskStorage(mapper);
+        JsonStoryStorage jsonStoryStorage = new JsonStoryStorage(mapper);
+        JsonDefectStorage jsonDefectStorage = new JsonDefectStorage(mapper);
+        JsonFeatureStorage jsonFeatureStorage = new JsonFeatureStorage(mapper);
+        JsonRelationStorage jsonRelationStorage = new JsonRelationStorage(mapper);
 
+        TaskService taskService = new TaskService(jsonTaskStorage);
+        StoryService storyService = new StoryService(jsonStoryStorage);
+        DefectService defectService = new DefectService(jsonDefectStorage);
+        RelationService relationService = new RelationService(jsonRelationStorage);
+        FeatureService featureService = new FeatureService(jsonFeatureStorage);
+
+
+        try {
+            List<Task> loadTasks = jsonTaskStorage.loadTasks();
+            taskService.getTaskFromJson(loadTasks);
+            List<Story> loadStories = jsonStoryStorage.loadStories();
+            storyService.getStoryFromJson(loadStories);
+            List<Defect> loadDefects = jsonDefectStorage.loadDefects();
+            defectService.getDefectFromJson(loadDefects);
+            List<Feature> loadFeatures = jsonFeatureStorage.loadFeatures();
+            featureService.getFeatureFromJson(loadFeatures);
+            List<Relation> loadRelations = jsonRelationStorage.loadRelations();
+            relationService.getRelationFromJson(loadRelations);
+
+
+        } catch (IOException e) {
+            printService.printMessage("Не удалось загрузить элементы из файла");
         }
 
+        ConsoleService consoleService = new ConsoleService(inputService, printService, taskService, relationService, storyService, defectService, featureService, modelService);
+        consoleService.run();
     }
 }
