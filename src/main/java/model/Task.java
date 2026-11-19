@@ -1,36 +1,44 @@
 package model;
 
-public class Task {
-    private int id;
-    private String title;
-    private String description;
+import java.util.ArrayList;
+import java.util.List;
 
-    public Task(String title, String description){
-        this.title = title;
-        this.description = description;
+public class Task extends Element {
+    private List<Defect> defects = new ArrayList<>();
+    private List<Task> tasks = new ArrayList<>();
+    private List<Story> stories = new ArrayList<>();
+
+    public Task(String title, String description) {
+        super(title, description);
     }
 
-    public String getTitle(){
-        return title;
+    public Task() {
     }
 
-    public void setTitle(String title){
-        this.title = title;
+    //TODO подумать над названием и раположением
+    public void addDefectToRelation(Defect defect) {
+        defects.add(defect);
     }
 
-    public String getDescription(){
-        return description;
+    public List<Defect> getRelatedDefects() {
+        return defects;
     }
 
-    public void setDescription(String description){
-        this.description = description;
+    //TODO подумать над названием и раположением
+    public void addTaskToRelation(Task task) {
+        tasks.add(task);
     }
 
-    public int getId() {
-        return id;
+    public List<Task> getRelatedTasks() {
+        return tasks;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    //TODO подумать над названием и раположением
+    public void addStoryToRelation(Story story) {
+        stories.add(story);
+    }
+
+    public List<Story> getRelatedStories() {
+        return stories;
     }
 }
