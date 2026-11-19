@@ -4,11 +4,10 @@ import enums.RelationTypeEnum;
 import exception.*;
 import model.*;
 
-import static constants.UpdateElements.TITLE;
-import static constants.UpdateElements.DESCRIPTION;
-
 import java.io.IOException;
 import java.util.List;
+
+import static constants.UpdateElements.*;
 
 public class ConsoleService {
     private final InputService inputService;
@@ -174,6 +173,21 @@ public class ConsoleService {
                     break;
                 }
 
+                case 26: {
+                    deleteRelation();
+                    break;
+                }
+
+                case 27: {
+                    showAllRelations();
+                    break;
+                }
+
+                case 28: {
+                    updateRelation();
+                    break;
+                }
+
                 case 0: {
                     running = false;
                     break;
@@ -202,6 +216,10 @@ public class ConsoleService {
 
     private void showAllFeatures() {
         printService.printAllFeatures(featureService.getAllFeatures());
+    }
+
+    private void showAllRelations() {
+        printService.printAllRelations(relationService.getRelations());
     }
 
     private void createTask() {
@@ -426,6 +444,30 @@ public class ConsoleService {
             printService.printMessage(e.getMessage());
         } catch (IOException e) {
             printService.printMessage("Не удалось удалить дефект из файла");
+        }
+    }
+
+    private void deleteRelation() {
+        List<Relation> allRelations = relationService.getRelations();
+
+        if (allRelations.isEmpty()) {
+            printService.printMessage("Связей для удаления нет");
+            return;
+        }
+
+        printService.printAllRelations(allRelations);
+        printService.printEnterIdToDelete();
+
+        int numId = inputService.readInt();
+
+        try {
+            relationService.deleteRelation(numId);
+            relationService.saveRelationToJson(relationService.getRelations());
+            printService.printMessage("Связь с Id " + numId + " удалена");
+        } catch (RelationNotFoundException e) {
+            printService.printMessage(e.getMessage());
+        } catch (IOException e) {
+            printService.printMessage("Не удалось удалить связь из файла");
         }
     }
 
@@ -726,6 +768,49 @@ public class ConsoleService {
         }
     }
 
+    private void updateRelation() {
+        List<Relation> allRelations = relationService.getRelations();
+
+        if (allRelations.isEmpty()) {
+            printService.printMessage("Связей для изменения нет");
+            return;
+        }
+
+        printService.printAllRelations(allRelations);
+        printService.printEnterIdToUpdate();
+
+        int numId = inputService.readInt();
+        printService.printUpdateRelationMenu();
+        int num = inputService.readInt();
+
+        if (num != MAIN && num != SUB) {
+            printService.printMessage("Неизвестный вариант");
+            return;
+        }
+
+        int value = readUpdateIdValue(num);
+
+        int newMAIN = 0;
+        int newSUB = 0;
+
+        if (num == MAIN) {
+            newMAIN = value;
+
+        } else {
+            newSUB = value;
+        }
+
+        try {
+            relationService.updateRelation(numId, newMAIN, newSUB);
+            relationService.saveRelationToJson(relationService.getRelations());
+            printService.printMessage("Связь изменена");
+        } catch (RelationNotFoundException | InvalidElementException e) {
+            printService.printMessage(e.getMessage());
+        } catch (IOException e) {
+            printService.printMessage("Не удалось обновить связь в файле");
+        }
+    }
+
     private String readUpdateValue(int num) {
         if (num == TITLE) {
             printService.printMessage("Введите новое название:");
@@ -738,17 +823,28 @@ public class ConsoleService {
         return null;
     }
 
+    private int readUpdateIdValue(int num) {
+        if (num == MAIN) {
+            printService.printMessage("Введите новый id главного элемента:");
+            return inputService.readInt();
+
+        } else if (num == SUB) {
+            printService.printMessage("Введите новый id зависимого элемента:");
+            return inputService.readInt();
+        }
+        return 0;
+    }
+
     private void relationFeatureStory(String type) {
-        System.out.println("Выберите id истории, которую хотите свзять с фичёй: ");
         printService.printAllStories(storyService.getAllStories());
+        System.out.println("Выберите id истории, которую хотите свзять с фичёй: ");
         int id_story = inputService.readInt();
 
-        System.out.println("Выберите id фичи, которую хотите свзять с историей id = " + id_story);
         printService.printAllFeatures(featureService.getAllFeatures());
+        System.out.println("Выберите id фичи, которую хотите свзять с историей id = " + id_story);
         int id_feature = inputService.readInt();
 
-        Relation relation = new Relation(RelationTypeEnum.valueOf(type), id_story, id_feature);
-        printService.printRelation(relation);
+        Relation relation = new Relation(RelationTypeEnum.valueOf(type), id_feature, id_story);
 
         Feature feature = featureService.findFeatureById(id_feature);
         Story story = storyService.findStoryById(id_story);
@@ -757,6 +853,7 @@ public class ConsoleService {
 
         try {
             relationService.addRelation(relation);
+            printService.printRelation(relation);
             relationService.saveRelationToJson(relationService.getRelations());
         } catch (IOException e) {
             printService.printMessage("Не удалось сохранить связь в файл");
@@ -764,16 +861,15 @@ public class ConsoleService {
     }
 
     private void relationStoryTask(String type) {
-        System.out.println("Выберите id истории, которую хотите свзять с задачей: ");
         printService.printAllStories(storyService.getAllStories());
+        System.out.println("Выберите id истории, которую хотите свзять с задачей: ");
         int id_story = inputService.readInt();
 
-        System.out.println("Выберите id задачи, которую хотите свзять с историей id = " + id_story);
         printService.printAllTasks(taskService.getAllTasks());
+        System.out.println("Выберите id задачи, которую хотите свзять с историей id = " + id_story);
         int id_task = inputService.readInt();
 
         Relation relation = new Relation(RelationTypeEnum.valueOf(type), id_story, id_task);
-        printService.printRelation(relation);
 
         Story story = storyService.findStoryById(id_story);
         Task task = taskService.findTaskById(id_task);
@@ -782,6 +878,7 @@ public class ConsoleService {
 
         try {
             relationService.addRelation(relation);
+            printService.printRelation(relation);
             relationService.saveRelationToJson(relationService.getRelations());
         } catch (IOException e) {
             printService.printMessage("Не удалось сохранить связь в файл");
@@ -789,16 +886,15 @@ public class ConsoleService {
     }
 
     private void relationStoryDefect(String type) {
-        System.out.println("Выберите id истории, которую хотите свзять с дефектом: ");
         printService.printAllStories(storyService.getAllStories());
+        System.out.println("Выберите id истории, которую хотите свзять с дефектом: ");
         int id_story = inputService.readInt();
 
-        System.out.println("Выберите id дефекта, который хотите свзять с историей id = " + id_story);
         printService.printAllDefects(defectService.getAllDefects());
+        System.out.println("Выберите id дефекта, который хотите свзять с историей id = " + id_story);
         int id_defect = inputService.readInt();
 
         Relation relation = new Relation(RelationTypeEnum.valueOf(type), id_story, id_defect);
-        printService.printRelation(relation);
 
         Story story = storyService.findStoryById(id_story);
         Defect defect = defectService.findDefectById(id_defect);
@@ -807,6 +903,7 @@ public class ConsoleService {
 
         try {
             relationService.addRelation(relation);
+            printService.printRelation(relation);
             relationService.saveRelationToJson(relationService.getRelations());
         } catch (IOException e) {
             printService.printMessage("Не удалось сохранить связь в файл");
@@ -814,16 +911,15 @@ public class ConsoleService {
     }
 
     private void relationParentTask(String type) {
-        System.out.println("Выберите id задачи, которую хотите свзять с подзадачей: ");
         printService.printAllTasks(taskService.getAllTasks());
+        System.out.println("Выберите id задачи, которую хотите свзять с подзадачей: ");
         int id_taskMain = inputService.readInt();
 
-        System.out.println("Выберите id подзадачи, которую хотите свзять с задачей id = " + id_taskMain);
         printService.printAllTasks(taskService.getAllTasks());
+        System.out.println("Выберите id подзадачи, которую хотите свзять с задачей id = " + id_taskMain);
         int id_taskSub = inputService.readInt();
 
         Relation relation = new Relation(RelationTypeEnum.valueOf(type), id_taskMain, id_taskSub);
-        printService.printRelation(relation);
 
         Task taskMain = taskService.findTaskById(id_taskMain);
         Task taskSub = taskService.findTaskById(id_taskSub);
@@ -832,6 +928,7 @@ public class ConsoleService {
 
         try {
             relationService.addRelation(relation);
+            printService.printRelation(relation);
             relationService.saveRelationToJson(relationService.getRelations());
         } catch (IOException e) {
             printService.printMessage("Не удалось сохранить связь в файл");
@@ -840,16 +937,15 @@ public class ConsoleService {
     }
 
     private void relationBlockTask(String type) {
-        System.out.println("Выберите id блокирующей задачи: ");
         printService.printAllTasks(taskService.getAllTasks());
+        System.out.println("Выберите id блокирующей задачи: ");
         int id_taskMain = inputService.readInt();
 
-        System.out.println("Выберите id задачи, блокируемой задачей id = " + id_taskMain);
         printService.printAllTasks(taskService.getAllTasks());
+        System.out.println("Выберите id задачи, блокируемой задачей id = " + id_taskMain);
         int id_taskSub = inputService.readInt();
 
         Relation relation = new Relation(RelationTypeEnum.valueOf(type), id_taskMain, id_taskSub);
-        printService.printRelation(relation);
 
         Task taskMain = taskService.findTaskById(id_taskMain);
         Task taskSub = taskService.findTaskById(id_taskSub);
@@ -858,6 +954,7 @@ public class ConsoleService {
 
         try {
             relationService.addRelation(relation);
+            printService.printRelation(relation);
             relationService.saveRelationToJson(relationService.getRelations());
         } catch (IOException e) {
             printService.printMessage("Не удалось сохранить связь в файл");
@@ -866,16 +963,15 @@ public class ConsoleService {
     }
 
     private void relationRelatedToTask(String type) {
-        System.out.println("Выберите id связываемой задачи: ");
         printService.printAllTasks(taskService.getAllTasks());
+        System.out.println("Выберите id связываемой задачи: ");
         int id_taskMain = inputService.readInt();
 
-        System.out.println("Выберите id задачи, связанной с задачей id = " + id_taskMain);
         printService.printAllTasks(taskService.getAllTasks());
+        System.out.println("Выберите id задачи, связанной с задачей id = " + id_taskMain);
         int id_taskSub = inputService.readInt();
 
         Relation relation = new Relation(RelationTypeEnum.valueOf(type), id_taskMain, id_taskSub);
-        printService.printRelation(relation);
 
         Task taskMain = taskService.findTaskById(id_taskMain);
         Task taskSub = taskService.findTaskById(id_taskSub);
@@ -884,6 +980,7 @@ public class ConsoleService {
 
         try {
             relationService.addRelation(relation);
+            printService.printRelation(relation);
             relationService.saveRelationToJson(relationService.getRelations());
         } catch (IOException e) {
             printService.printMessage("Не удалось сохранить связь в файл");
@@ -891,16 +988,15 @@ public class ConsoleService {
     }
 
     private void relationDefectTask(String type) {
-        System.out.println("Выберите id задачи, по которой обнаружен дефект: ");
         printService.printAllTasks(taskService.getAllTasks());
+        System.out.println("Выберите id задачи, по которой обнаружен дефект: ");
         int id_task = inputService.readInt();
 
-        System.out.println("Выберите id дефекта, который описывает задачу с id = " + id_task);
         printService.printAllDefects(defectService.getAllDefects());
+        System.out.println("Выберите id дефекта, который описывает задачу с id = " + id_task);
         int id_defect = inputService.readInt();
 
         Relation relation = new Relation(RelationTypeEnum.valueOf(type), id_task, id_defect);
-        printService.printRelation(relation);
 
         Task task = taskService.findTaskById(id_task);
         Defect defect = defectService.findDefectById(id_defect);
@@ -909,6 +1005,7 @@ public class ConsoleService {
 
         try {
             relationService.addRelation(relation);
+            printService.printRelation(relation);
             relationService.saveRelationToJson(relationService.getRelations());
         } catch (IOException e) {
             printService.printMessage("Не удалось сохранить связь в файл");
@@ -916,16 +1013,15 @@ public class ConsoleService {
     }
 
     private void relationFixesToTask(String type) {
-        System.out.println("Выберите id задачи, по которой необходимо исправить дефект: ");
         printService.printAllTasks(taskService.getAllTasks());
+        System.out.println("Выберите id задачи, по которой необходимо исправить дефект: ");
         int id_task = inputService.readInt();
 
-        System.out.println("Выберите id дефекта, который описывает задачу с id = " + id_task);
         printService.printAllDefects(defectService.getAllDefects());
+        System.out.println("Выберите id дефекта, который описывает задачу с id = " + id_task);
         int id_defect = inputService.readInt();
 
         Relation relation = new Relation(RelationTypeEnum.valueOf(type), id_task, id_defect);
-        printService.printRelation(relation);
 
         Task task = taskService.findTaskById(id_task);
         Defect defect = defectService.findDefectById(id_defect);
@@ -934,6 +1030,7 @@ public class ConsoleService {
 
         try {
             relationService.addRelation(relation);
+            printService.printRelation(relation);
             relationService.saveRelationToJson(relationService.getRelations());
         } catch (IOException e) {
             printService.printMessage("Не удалось сохранить связь в файл");

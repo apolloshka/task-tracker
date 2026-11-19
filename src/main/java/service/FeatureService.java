@@ -1,13 +1,9 @@
 package service;
 
-import exception.DefectNotFoundException;
 import exception.FeatureNotFoundException;
 import exception.InvalidElementException;
-import model.Defect;
 import model.Feature;
-import model.Story;
 import storage.JsonFeatureStorage;
-import storage.JsonTaskStorage;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -46,7 +42,7 @@ public class FeatureService {
             String newTitle,
             String newDescription) {
 
-        Feature defect = findFeatureById(id);
+        Feature feature = findFeatureById(id);
 
         if (newTitle == null && newDescription == null) {
             throw new InvalidElementException("Не указаны данные для изменения");
@@ -61,11 +57,11 @@ public class FeatureService {
         }
 
         if (newTitle != null) {
-            defect.setTitle(newTitle);
+            feature.setTitle(newTitle);
         }
 
         if (newDescription != null) {
-            defect.setDescription(newDescription);
+            feature.setDescription(newDescription);
         }
     }
 

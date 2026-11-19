@@ -9,7 +9,6 @@ public class Feature extends Element {
 
     public Feature(String title, String description) {
         super(title, description);
-        this.stories = stories;
     }
 
     public Feature() {
