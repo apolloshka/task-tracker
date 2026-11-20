@@ -21,7 +21,6 @@ public class Main {
 
 
         //TODO применима ли тут какая-нибудь ленивая инициализация? где должны создаваться эти объекты (не main?)
-        PrintService printService = new PrintService();
         ModelService modelService = new ModelService();
 
         JsonTaskStorage jsonTaskStorage = new JsonTaskStorage(mapper);
@@ -36,6 +35,7 @@ public class Main {
         RelationService relationService = new RelationService(jsonRelationStorage);
         FeatureService featureService = new FeatureService(jsonFeatureStorage);
 
+        PrintService printService = new PrintService(relationService, storyService, taskService);
 
         try {
             List<Task> loadTasks = jsonTaskStorage.loadTasks();

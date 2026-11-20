@@ -11,6 +11,17 @@ import static constants.UpdateElements.*;
 
 public class PrintService {
 
+    private RelationService relationService;
+    private StoryService storyService;
+    private TaskService taskService;
+
+
+    public PrintService(RelationService relationService, StoryService storyService, TaskService taskService) {
+        this.relationService = relationService;
+        this.storyService = storyService;
+        this.taskService = taskService;
+    }
+
     public void printMenu() {
         System.out.println();
         System.out.println("1 - Создать задачу");
@@ -197,6 +208,69 @@ public class PrintService {
         }
     }
 
+    public void printFeatureWithRelations(Feature feature, List<Relation> relations) {
+        System.out.println("Id фичи: " + feature.getId()
+                + " Название: " + feature.getTitle());
+
+        System.out.println("Связанные истории:");
+
+        for (Relation relation : relations) {
+
+            for (Story story : feature.getRelatedStories()) {
+
+                if (story.getId() == relation.getSubordinateId()) {
+                    System.out.println(
+                            "Id истории: " + story.getId()
+                                    + " Название: " + story.getTitle()
+                                    + " Тип связи: " + relation.getType()
+                    );
+                }
+            }
+        }
+    }
+
+    public void printTaskWithRelations(Task task, List<Relation> relations) {
+        System.out.println("Id задачи: " + task.getId()
+                + " Название: " + task.getTitle());
+
+        System.out.println("Связанные задачи:");
+
+        for (Relation relation : relations) {
+
+            for (Task task1 : task.getRelatedTasks()) {
+
+                if ((task.getId() == relation.getMainId() && relation.getSubordinateId() == task1.getId()) || (relation.getSubordinateId() == task.getId() && relation.getMainId() == task1.getId())) {
+                    System.out.println(
+                            "Id задачи: " + task1.getId()
+                                    + " Название: " + task1.getTitle()
+                                    + " Тип связи: " + relation.getType()
+                    );
+                }
+            }
+        }
+    }
+
+    public void printStoryWithRelations(Story story, List<Relation> relations) {
+        System.out.println("Id истории: " + story.getId()
+                + " Название: " + story.getTitle());
+
+        System.out.println("Связанные фичи:");
+
+        for (Relation relation : relations) {
+
+            for (Feature feature : story.getRelatedFeatures()) {
+
+                if (story.getId() == relation.getSubordinateId()) {
+                    System.out.println(
+                            "Id фичи: " + feature.getId()
+                                    + " Название: " + feature.getTitle()
+                                    + " Тип связи: " + relation.getType()
+                    );
+                }
+            }
+        }
+    }
+
     private void printFeatureShort(Feature feature) {
         System.out.println(
                 "Id фичи: " + feature.getId()
@@ -229,7 +303,7 @@ public class PrintService {
         System.out.println("Найденные задачи:");
 
         for (Task task : tasks) {
-            printTask(task);
+            printTaskWithRelations(task, relationService.findTaskRelations(task));
         }
     }
 
@@ -242,7 +316,7 @@ public class PrintService {
         System.out.println("Найденные истории:");
 
         for (Story story : stories) {
-            printStory(story);
+            printStoryWithRelations(story, relationService.findStoryRelations(story));
         }
     }
 
@@ -268,7 +342,7 @@ public class PrintService {
         System.out.println("Найденные фичи:");
 
         for (Feature feature : features) {
-            printFeature(feature);
+            printFeatureWithRelations(feature, relationService.findFeatureRelations(feature));
         }
     }
 

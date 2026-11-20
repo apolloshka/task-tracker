@@ -853,6 +853,7 @@ public class ConsoleService {
 
         try {
             relationService.addRelation(relation);
+//            storyService.saveStoryToJson(storyService.getAllStories());
             printService.printRelation(relation);
             relationService.saveRelationToJson(relationService.getRelations());
         } catch (IOException e) {

@@ -1,26 +1,21 @@
 [ {
-  "id" : 2,
-  "type" : "PARENT_TASK",
-  "mainId" : 8,
-  "subordinateId" : 10
-}, {
-  "id" : 3,
-  "type" : "STORY_DEFECT",
-  "mainId" : 1,
-  "subordinateId" : 4
-}, {
-  "id" : 4,
-  "type" : "STORY_DEFECT",
-  "mainId" : 4,
-  "subordinateId" : 4
-}, {
-  "id" : 5,
-  "type" : "STORY_DEFECT",
+  "id" : 1,
+  "type" : "FEATURE_STORY",
   "mainId" : 1,
   "subordinateId" : 1
 }, {
-  "id" : 6,
+  "id" : 2,
   "type" : "FEATURE_STORY",
   "mainId" : 2,
-  "subordinateId" : 2
+  "subordinateId" : 1
+}, {
+  "id" : 3,
+  "type" : "BLOCKS",
+  "mainId" : 2,
+  "subordinateId" : 3
+}, {
+  "id" : 4,
+  "type" : "BLOCKS",
+  "mainId" : 11,
+  "subordinateId" : 9
 } ]

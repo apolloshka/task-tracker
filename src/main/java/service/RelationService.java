@@ -1,5 +1,6 @@
 package service;
 
+import enums.ModelEnum;
 import enums.RelationTypeEnum;
 import exception.FeatureNotFoundException;
 import exception.InvalidElementException;
@@ -78,6 +79,61 @@ public class RelationService {
         }
     }
 
+
+    public List<Relation> findFeatureRelations(Feature feature) {
+
+        List<Relation> foundRelations = new ArrayList<>();
+
+        for (Relation relation : relations) {
+
+            if (relation.getType() == RelationTypeEnum.FEATURE_STORY
+                    && relation.getMainId() == feature.getId()) {
+
+                foundRelations.add(relation);
+            }
+        }
+        return foundRelations;
+    }
+
+    public List<Relation> findStoryRelations(Story story) {
+
+        List<Relation> foundRelations = new ArrayList<>();
+
+        for (Relation relation : relations) {
+
+            if (relation.getType() == RelationTypeEnum.FEATURE_STORY && relation.getSubordinateId() == story.getId()) {
+
+                foundRelations.add(relation);
+            }
+        }
+        return foundRelations;
+    }
+
+    public List<Relation> findTaskRelations(Task task) {
+
+        List<Relation> foundRelations = new ArrayList<>();
+
+        for (Relation relation : relations) {
+
+//            if (relation.getType() == RelationTypeEnum.RELATED_TO && relation.getMainId() == task.getId()) {
+//
+//                foundRelations.add(relation);
+//            }
+
+            if (relation.getType() == RelationTypeEnum.BLOCKS && relation.getMainId() == task.getId() || relation.getSubordinateId() == task.getId()) {
+
+                foundRelations.add(relation);
+            }
+
+//            if (relation.getType() == RelationTypeEnum.PARENT_TASK && relation.getMainId() == task.getId()) {
+//
+//                foundRelations.add(relation);
+//            }
+        }
+        return foundRelations;
+    }
+
+
     public void restoreFeatureStoryRelations(FeatureService featureService, StoryService storyService) {
         for (Relation relation : relations) {
             if (relation.getType() == RelationTypeEnum.FEATURE_STORY) {
@@ -86,6 +142,7 @@ public class RelationService {
 
                 feature.addStoryToRelation(story);
                 story.addFeatureToRelation(feature);
+
             }
         }
     }
