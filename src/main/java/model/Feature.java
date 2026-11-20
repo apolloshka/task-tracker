@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Feature extends Element {
-
     private List<Story> stories = new ArrayList<>();
 
     public Feature(String title, String description) {

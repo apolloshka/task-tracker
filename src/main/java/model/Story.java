@@ -4,12 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Story extends Element {
-
     //TODO хочу сохранять вложенные в истории таски и дефекты
     private List<Task> tasks = new ArrayList<>();
     private List<Defect> defects = new ArrayList<>();
     private List<Feature> features = new ArrayList<>();
-
 
     public Story(String title, String description) {
         super(title, description);

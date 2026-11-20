@@ -3,14 +3,12 @@ package storage;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import model.Defect;
-import model.Story;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
 public class JsonDefectStorage {
-
     private ObjectMapper mapper;
 
     public JsonDefectStorage(ObjectMapper mapper) {

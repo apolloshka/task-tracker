@@ -5,9 +5,7 @@ import enums.RelationTypeEnum;
 public class Relation {
     private int id;
     private RelationTypeEnum type;
-
     //TODO подумать над названиями полей
-
     private int mainId;
     private int subordinateId;
 
@@ -27,7 +25,6 @@ public class Relation {
     public void setId(int id) {
         this.id = id;
     }
-
 
     public RelationTypeEnum getType() {
         return type;

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Defect extends Element {
-
     private List<Task> tasks = new ArrayList<>();
     private List<Story> stories = new ArrayList<>();
 

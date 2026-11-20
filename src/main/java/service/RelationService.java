@@ -2,7 +2,6 @@ package service;
 
 import enums.ModelEnum;
 import enums.RelationTypeEnum;
-import exception.FeatureNotFoundException;
 import exception.InvalidElementException;
 import exception.RelationNotFoundException;
 import model.*;
@@ -13,11 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RelationService {
-
     private int id = 1;
-
     public final List<Relation> relations;
-
     private JsonRelationStorage jsonRelationStorage;
 
     public RelationService(JsonRelationStorage jsonRelationStorage) {
@@ -27,7 +23,6 @@ public class RelationService {
 
     public List<RelationTypeEnum> getRelationType() {
         List<RelationTypeEnum> types = new ArrayList<>();
-
         for (RelationTypeEnum type : RelationTypeEnum.values()) {
             types.add(type);
         }
@@ -39,7 +34,6 @@ public class RelationService {
     }
 
     public void addRelation(Relation newRelation) {
-
         newRelation.setId(id);
         id++;
         relations.add(newRelation);
@@ -63,17 +57,13 @@ public class RelationService {
             int id,
             int mainId,
             int subordinateId) {
-
         Relation relation = findRelationById(id);
-
         if (mainId == 0 && subordinateId == 0) {
             throw new InvalidElementException("Не указаны данные для изменения");
         }
-
         if (mainId != 0) {
             relation.setMainId(mainId);
         }
-
         if (subordinateId != 0) {
             relation.setSubordinateId(subordinateId);
         }
@@ -139,7 +129,6 @@ public class RelationService {
             if (relation.getType() == RelationTypeEnum.FEATURE_STORY) {
                 Feature feature = featureService.findFeatureById(relation.getMainId());
                 Story story = storyService.findStoryById(relation.getSubordinateId());
-
                 feature.addStoryToRelation(story);
                 story.addFeatureToRelation(feature);
 
@@ -230,10 +219,8 @@ public class RelationService {
 
     public void getRelationFromJson(List<Relation> loadRelations) throws IOException {
         id = 1;
-
         for (Relation relation : loadRelations) {
             relations.add(relation);
-
             if (relation.getId() >= id) {
                 id = relation.getId() + 1;
             }

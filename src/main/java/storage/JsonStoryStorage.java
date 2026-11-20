@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.util.List;
 
 public class JsonStoryStorage {
-
     private ObjectMapper mapper;
 
     public JsonStoryStorage(ObjectMapper mapper) {

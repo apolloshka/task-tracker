@@ -1,8 +1,5 @@
 package model;
 
-import java.util.List;
-
-
 public abstract class Element {
     private int id;
     private String title;

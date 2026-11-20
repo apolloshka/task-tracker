@@ -3,7 +3,6 @@ package storage;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import model.Feature;
-import model.Relation;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,7 +12,6 @@ public class JsonFeatureStorage {
     private ObjectMapper mapper;
 
     public JsonFeatureStorage(ObjectMapper mapper) {
-
         this.mapper = mapper;
     }
 
