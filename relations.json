@@ -1,21 +1,32 @@
-[ {
-  "id" : 1,
-  "type" : "FEATURE_STORY",
-  "mainId" : 1,
-  "subordinateId" : 1
-}, {
-  "id" : 2,
-  "type" : "FEATURE_STORY",
-  "mainId" : 2,
-  "subordinateId" : 1
-}, {
-  "id" : 3,
-  "type" : "BLOCKS",
-  "mainId" : 2,
-  "subordinateId" : 3
-}, {
-  "id" : 4,
-  "type" : "BLOCKS",
-  "mainId" : 11,
-  "subordinateId" : 9
-} ]
+[
+  {
+    "id": 2,
+    "type": "STORY_TASK",
+    "mainId": 5,
+    "subordinateId": 5
+  },
+  {
+    "id": 3,
+    "type": "STORY_DEFECT",
+    "mainId": 3,
+    "subordinateId": 2
+  },
+  {
+    "id": 4,
+    "type": "PARENT_TASK",
+    "mainId": 4,
+    "subordinateId": 5
+  },
+  {
+    "id": 5,
+    "type": "BLOCKS",
+    "mainId": 4,
+    "subordinateId": 5
+  },
+  {
+    "id": 6,
+    "type": "DEFECT_FOUND",
+    "mainId": 4,
+    "subordinateId": 2
+  }
+]

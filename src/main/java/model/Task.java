@@ -1,12 +1,12 @@
 package model;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Task extends Element {
-    private List<Defect> defects = new ArrayList<>();
-    private List<Task> tasks = new ArrayList<>();
-    private List<Story> stories = new ArrayList<>();
+    private final Set<Defect> defects = new HashSet<>();
+    private final Set<Task> tasks = new HashSet<>();
+    private final Set<Story> stories = new HashSet<>();
 
     public Task(String title, String description) {
         super(title, description);
@@ -15,30 +15,28 @@ public class Task extends Element {
     public Task() {
     }
 
-    //TODO подумать над названием и раположением
+    // TODO Вариант обобщенного метода с дженериками в родителе - дубли остаются, кода не меньше
     public void addDefectToRelation(Defect defect) {
-        defects.add(defect);
+        addRelateElement(defects, defect);
     }
 
-    public List<Defect> getRelatedDefects() {
+    public Set<Defect> getRelatedDefects() {
         return defects;
     }
 
-    //TODO подумать над названием и раположением
     public void addTaskToRelation(Task task) {
-        tasks.add(task);
+        addRelateElement(tasks, task);
     }
 
-    public List<Task> getRelatedTasks() {
+    public Set<Task> getRelatedTasks() {
         return tasks;
     }
 
-    //TODO подумать над названием и раположением
     public void addStoryToRelation(Story story) {
-        stories.add(story);
+        addRelateElement(stories, story);
     }
 
-    public List<Story> getRelatedStories() {
+    public Set<Story> getRelatedStories() {
         return stories;
     }
 }

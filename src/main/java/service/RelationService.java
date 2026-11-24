@@ -1,6 +1,5 @@
 package service;
 
-import enums.ModelEnum;
 import enums.RelationTypeEnum;
 import exception.InvalidElementException;
 import exception.RelationNotFoundException;
@@ -9,6 +8,7 @@ import storage.JsonRelationStorage;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class RelationService {
@@ -22,11 +22,7 @@ public class RelationService {
     }
 
     public List<RelationTypeEnum> getRelationType() {
-        List<RelationTypeEnum> types = new ArrayList<>();
-        for (RelationTypeEnum type : RelationTypeEnum.values()) {
-            types.add(type);
-        }
-        return types;
+        return Arrays.asList(RelationTypeEnum.values()); //изучить
     }
 
     public List<Relation> getRelations() {
@@ -34,6 +30,13 @@ public class RelationService {
     }
 
     public void addRelation(Relation newRelation) {
+        for (Relation relation : relations) {
+            if (relation.getType() == newRelation.getType()
+                    && relation.getMainId() == newRelation.getMainId()
+                    && relation.getSubordinateId() == newRelation.getSubordinateId()) {
+                throw new InvalidElementException("Связь уже существует");
+            }
+        }
         newRelation.setId(id);
         id++;
         relations.add(newRelation);
@@ -69,16 +72,11 @@ public class RelationService {
         }
     }
 
-
+    //TODO объединить методы поиска связей
     public List<Relation> findFeatureRelations(Feature feature) {
-
         List<Relation> foundRelations = new ArrayList<>();
-
         for (Relation relation : relations) {
-
-            if (relation.getType() == RelationTypeEnum.FEATURE_STORY
-                    && relation.getMainId() == feature.getId()) {
-
+            if (relation.getType() == RelationTypeEnum.FEATURE_STORY && relation.getMainId() == feature.getId()) {
                 foundRelations.add(relation);
             }
         }
@@ -86,13 +84,13 @@ public class RelationService {
     }
 
     public List<Relation> findStoryRelations(Story story) {
-
         List<Relation> foundRelations = new ArrayList<>();
-
         for (Relation relation : relations) {
-
-            if (relation.getType() == RelationTypeEnum.FEATURE_STORY && relation.getSubordinateId() == story.getId()) {
-
+            if ((relation.getType() == RelationTypeEnum.FEATURE_STORY
+                    && relation.getSubordinateId() == story.getId())
+                    || ((relation.getType() == RelationTypeEnum.STORY_TASK
+                    || relation.getType() == RelationTypeEnum.STORY_DEFECT)
+                    && relation.getMainId() == story.getId())) {
                 foundRelations.add(relation);
             }
         }
@@ -100,38 +98,45 @@ public class RelationService {
     }
 
     public List<Relation> findTaskRelations(Task task) {
-
         List<Relation> foundRelations = new ArrayList<>();
-
         for (Relation relation : relations) {
-
-//            if (relation.getType() == RelationTypeEnum.RELATED_TO && relation.getMainId() == task.getId()) {
-//
-//                foundRelations.add(relation);
-//            }
-
-            if (relation.getType() == RelationTypeEnum.BLOCKS && relation.getMainId() == task.getId() || relation.getSubordinateId() == task.getId()) {
-
+            if ((relation.getType() == RelationTypeEnum.STORY_TASK
+                    && relation.getSubordinateId() == task.getId())
+                    || ((relation.getType() == RelationTypeEnum.PARENT_TASK
+                    || relation.getType() == RelationTypeEnum.BLOCKS
+                    || relation.getType() == RelationTypeEnum.RELATED_TO)
+                    && (relation.getMainId() == task.getId()
+                    || relation.getSubordinateId() == task.getId()))
+                    || ((relation.getType() == RelationTypeEnum.DEFECT_FOUND
+                    || relation.getType() == RelationTypeEnum.FIXES_DEFECT)
+                    && relation.getMainId() == task.getId())) {
                 foundRelations.add(relation);
             }
-
-//            if (relation.getType() == RelationTypeEnum.PARENT_TASK && relation.getMainId() == task.getId()) {
-//
-//                foundRelations.add(relation);
-//            }
         }
         return foundRelations;
     }
 
+    public List<Relation> findDefectRelations(Defect defect) {
+        List<Relation> foundRelations = new ArrayList<>();
+        for (Relation relation : relations) {
+            if ((relation.getType() == RelationTypeEnum.STORY_DEFECT
+                    || relation.getType() == RelationTypeEnum.DEFECT_FOUND
+                    || relation.getType() == RelationTypeEnum.FIXES_DEFECT)
+                    && relation.getSubordinateId() == defect.getId()) {
+                foundRelations.add(relation);
+            }
+        }
+        return foundRelations;
+    }
 
-    public void restoreFeatureStoryRelations(FeatureService featureService, StoryService storyService) {
+    //TODO объединить методы рестора связей
+    public void restoreFeatureStoryRelations(UniversalModelService<Feature> featureService, StoryService storyService) {
         for (Relation relation : relations) {
             if (relation.getType() == RelationTypeEnum.FEATURE_STORY) {
-                Feature feature = featureService.findFeatureById(relation.getMainId());
-                Story story = storyService.findStoryById(relation.getSubordinateId());
-                feature.addStoryToRelation(story);
-                story.addFeatureToRelation(feature);
-
+                Feature feature = featureService.findById(relation.getMainId());
+                Story story = storyService.findById(relation.getSubordinateId());
+                feature.addRelatedElement(story);
+                story.addRelatedElement(story.getRelatedFeatures(), feature);
             }
         }
     }
@@ -139,9 +144,9 @@ public class RelationService {
     public void restoreStoryTaskRelations(StoryService storyService, TaskService taskService) {
         for (Relation relation : relations) {
             if (relation.getType() == RelationTypeEnum.STORY_TASK) {
-                Story story = storyService.findStoryById(relation.getMainId());
-                Task task = taskService.findTaskById(relation.getSubordinateId());
-                story.addTaskToRelation(task);
+                Story story = storyService.findById(relation.getMainId());
+                Task task = taskService.findById(relation.getSubordinateId());
+                story.addRelatedElement(story.getRelatedTasks(), task);
                 task.addStoryToRelation(story);
             }
         }
@@ -150,10 +155,10 @@ public class RelationService {
     public void restoreStoryDefectRelations(StoryService storyService, DefectService defectService) {
         for (Relation relation : relations) {
             if (relation.getType() == RelationTypeEnum.STORY_DEFECT) {
-                Story story = storyService.findStoryById(relation.getMainId());
-                Defect defect = defectService.findDefectById(relation.getSubordinateId());
-                story.addDefectToRelation(defect);
-                defect.addStoryToRelation(story);
+                Story story = storyService.findById(relation.getMainId());
+                Defect defect = defectService.findById(relation.getSubordinateId());
+                story.addRelatedElement(story.getRelatedDefects(), defect);
+                defect.getRelatedStories().add(story);
             }
         }
     }
@@ -161,8 +166,8 @@ public class RelationService {
     public void restoreParentTaskRelations(TaskService taskServiceMain, TaskService taskServiceSub) {
         for (Relation relation : relations) {
             if (relation.getType() == RelationTypeEnum.PARENT_TASK) {
-                Task taskMain = taskServiceMain.findTaskById(relation.getMainId());
-                Task taskSub = taskServiceSub.findTaskById(relation.getSubordinateId());
+                Task taskMain = taskServiceMain.findById(relation.getMainId());
+                Task taskSub = taskServiceSub.findById(relation.getSubordinateId());
                 taskMain.addTaskToRelation(taskSub);
                 taskSub.addTaskToRelation(taskMain);
             }
@@ -172,8 +177,8 @@ public class RelationService {
     public void restoreBlockTaskRelations(TaskService taskServiceMain, TaskService taskServiceSub) {
         for (Relation relation : relations) {
             if (relation.getType() == RelationTypeEnum.BLOCKS) {
-                Task taskMain = taskServiceMain.findTaskById(relation.getMainId());
-                Task taskSub = taskServiceSub.findTaskById(relation.getSubordinateId());
+                Task taskMain = taskServiceMain.findById(relation.getMainId());
+                Task taskSub = taskServiceSub.findById(relation.getSubordinateId());
                 taskMain.addTaskToRelation(taskSub);
                 taskSub.addTaskToRelation(taskMain);
             }
@@ -183,8 +188,8 @@ public class RelationService {
     public void restoreRelatedTaskRelations(TaskService taskServiceMain, TaskService taskServiceSub) {
         for (Relation relation : relations) {
             if (relation.getType() == RelationTypeEnum.RELATED_TO) {
-                Task taskMain = taskServiceMain.findTaskById(relation.getMainId());
-                Task taskSub = taskServiceSub.findTaskById(relation.getSubordinateId());
+                Task taskMain = taskServiceMain.findById(relation.getMainId());
+                Task taskSub = taskServiceSub.findById(relation.getSubordinateId());
                 taskMain.addTaskToRelation(taskSub);
                 taskSub.addTaskToRelation(taskMain);
             }
@@ -194,10 +199,10 @@ public class RelationService {
     public void restoreRelatedTaskRelations(TaskService taskService, DefectService defectService) {
         for (Relation relation : relations) {
             if (relation.getType() == RelationTypeEnum.DEFECT_FOUND) {
-                Task task = taskService.findTaskById(relation.getMainId());
-                Defect defect = defectService.findDefectById(relation.getSubordinateId());
+                Task task = taskService.findById(relation.getMainId());
+                Defect defect = defectService.findById(relation.getSubordinateId());
                 task.addDefectToRelation(defect);
-                defect.addTaskToRelation(task);
+                defect.getRelatedTasks().add(task);
             }
         }
     }
@@ -205,10 +210,10 @@ public class RelationService {
     public void restoreFixesTaskRelations(TaskService taskService, DefectService defectService) {
         for (Relation relation : relations) {
             if (relation.getType() == RelationTypeEnum.FIXES_DEFECT) {
-                Task task = taskService.findTaskById(relation.getMainId());
-                Defect defect = defectService.findDefectById(relation.getSubordinateId());
+                Task task = taskService.findById(relation.getMainId());
+                Defect defect = defectService.findById(relation.getSubordinateId());
                 task.addDefectToRelation(defect);
-                defect.addTaskToRelation(task);
+                defect.getRelatedTasks().add(task);
             }
         }
     }
@@ -217,7 +222,7 @@ public class RelationService {
         jsonRelationStorage.saveRelations(relations);
     }
 
-    public void getRelationFromJson(List<Relation> loadRelations) throws IOException {
+    public void load(List<Relation> loadRelations) {
         id = 1;
         for (Relation relation : loadRelations) {
             relations.add(relation);

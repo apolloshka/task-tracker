@@ -1,7 +1,12 @@
 package exception;
 
-public class DefectNotFoundException extends RuntimeException {
+public class DefectNotFoundException extends AbstractElementNotFoundException {
     public DefectNotFoundException(int id) {
-        super("Дефект с Id = " + id + " не найден");
+        super(id);
+    }
+
+    @Override
+    public String getElementName() {
+        return "Дефект";
     }
 }

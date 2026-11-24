@@ -1,98 +1,39 @@
 package service;
 
-import exception.DefectNotFoundException;
-import exception.InvalidElementException;
 import model.Defect;
-import storage.JsonDefectStorage;
+import storage.JsonStorage;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DefectService {
-    private List<Defect> defects;
+public class DefectService implements ElementService<Defect> {
+    private final List<Defect> defects;
     private int id = 1;
-    private JsonDefectStorage jsonDefectStorage;
+    private final JsonStorage<Defect> storage;
 
-    public DefectService(JsonDefectStorage jsonDefectStorage) {
+    public DefectService(JsonStorage<Defect> storage) {
         defects = new ArrayList<>();
-        this.jsonDefectStorage = jsonDefectStorage;
+        this.storage = storage;
     }
 
-    public void addDefect(Defect newDefect) {
-        if (newDefect.getTitle() == null || newDefect.getTitle().isBlank()) {
-            throw new InvalidElementException("Название дефекта не может быть пустым");
-        }
-        newDefect.setId(id);
-        id++;
-        defects.add(newDefect);
+    @Override
+    public void setNextId(int id) {
+        this.id = id;
     }
 
-    public void deleteDefect(int id) {
-        Defect defect = findDefectById(id);
-        defects.remove(defect);
+    @Override
+    public List<Defect> getAll() {
+        return defects;
     }
 
-    public void updateDefect(
-            int id,
-            String newTitle,
-            String newDescription) {
-        Defect defect = findDefectById(id);
-        if (newTitle == null && newDescription == null) {
-            throw new InvalidElementException("Не указаны данные для изменения");
-        }
-        if (newTitle != null && newTitle.isBlank()) {
-            throw new InvalidElementException("Название дефекта не может быть пустым");
-        }
-        if (newDescription != null && newDescription.isBlank()) {
-            throw new InvalidElementException("Описание дефекта не может быть пустым");
-        }
-        if (newTitle != null) {
-            defect.setTitle(newTitle);
-        }
-        if (newDescription != null) {
-            defect.setDescription(newDescription);
-        }
+    @Override
+    public int NextId() {
+        return id++;
     }
 
-    public Defect findDefectById(int id) {
-        for (Defect defect : defects) {
-            if (defect.getId() == id) {
-                return defect;
-            }
-        }
-        throw new DefectNotFoundException(id);
-    }
-
-    public List<Defect> findDefectByTitle(String title) {
-        if (title == null || title.isBlank()) {
-            throw new InvalidElementException("Название для поиска не может быть пустым");
-        }
-        List<Defect> foundDefects = new ArrayList<>();
-        for (Defect defect : defects) {
-            if (defect.getTitle().contains(title)) {
-                foundDefects.add(defect);
-            }
-        }
-        return foundDefects;
-    }
-
-    public List<Defect> getAllDefects() {
-        return new ArrayList<>(defects);
-    }
-
-    public void saveDefectToJson(List<Defect> defects) throws IOException {
-        jsonDefectStorage.saveDefects(defects);
-    }
-
-    public void getDefectFromJson(List<Defect> loadDefects) throws IOException {
-        id = 1;
-        for (Defect defect : loadDefects) {
-            defects.add(defect);
-            if (defect.getId() >= id) {
-                id = defect.getId() + 1;
-            }
-        }
+    @Override
+    public JsonStorage<Defect> getStorage() {
+        return storage;
     }
 }
 

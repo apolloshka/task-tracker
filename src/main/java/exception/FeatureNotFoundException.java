@@ -1,7 +1,12 @@
 package exception;
 
-public class FeatureNotFoundException extends RuntimeException {
+public class FeatureNotFoundException extends AbstractElementNotFoundException {
     public FeatureNotFoundException(int id) {
-        super("Фича с Id = " + id + " не найдена");
+        super(id);
+    }
+
+    @Override
+    public String getElementName() {
+        return "Фича";
     }
 }

@@ -1,9 +1,11 @@
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import exception.LoadRelationException;
 import model.*;
 import service.*;
-import storage.*;
+import storage.JsonRelationStorage;
+import storage.JsonStorage;
 
 import java.io.IOException;
 import java.util.List;
@@ -17,44 +19,45 @@ public class Main {
         mapper.enable(SerializationFeature.INDENT_OUTPUT); //настройка mapper'а
         //TODO применима ли тут какая-нибудь ленивая инициализация? где должны создаваться эти объекты (не main?)
         ModelService modelService = new ModelService();
-        JsonTaskStorage jsonTaskStorage = new JsonTaskStorage(mapper);
-        JsonStoryStorage jsonStoryStorage = new JsonStoryStorage(mapper);
-        JsonDefectStorage jsonDefectStorage = new JsonDefectStorage(mapper);
-        JsonFeatureStorage jsonFeatureStorage = new JsonFeatureStorage(mapper);
+        JsonStorage<Task> jsonTaskStorage = new JsonStorage<>(mapper, "tasks.json", new TypeReference<List<Task>>() {
+        });
+        JsonStorage<Story> jsonStoryStorage = new JsonStorage<>(mapper, "stories.json", new TypeReference<List<Story>>() {
+        });
+        JsonStorage<Defect> jsonDefectStorage = new JsonStorage<>(mapper, "defects.json", new TypeReference<List<Defect>>() {
+        });
+        JsonStorage<Feature> jsonFeatureStorage = new JsonStorage<>(mapper, "features.json", new TypeReference<List<Feature>>() {
+        });
         JsonRelationStorage jsonRelationStorage = new JsonRelationStorage(mapper);
         TaskService taskService = new TaskService(jsonTaskStorage);
         StoryService storyService = new StoryService(jsonStoryStorage);
         DefectService defectService = new DefectService(jsonDefectStorage);
         RelationService relationService = new RelationService(jsonRelationStorage);
-        FeatureService featureService = new FeatureService(jsonFeatureStorage);
-        PrintService printService = new PrintService(taskService, storyService, relationService);
+//        FeatureService featureService = new FeatureService(jsonFeatureStorage);
+        UniversalModelService<Feature> featureService = new UniversalModelService<>(jsonFeatureStorage);
+        PrintService printService = new PrintService(relationService, storyService, taskService);
         try {
-            List<Task> loadTasks = jsonTaskStorage.loadTasks();
-            taskService.getTaskFromJson(loadTasks);
+            taskService.load();
         } catch (IOException e) {
             printService.printMessage("Не удалось загрузить задачи из файла");
         }
         try {
-            List<Story> loadStories = jsonStoryStorage.loadStories();
-            storyService.getStoryFromJson(loadStories);
+            storyService.load();
         } catch (IOException e) {
             printService.printMessage("Не удалось загрузить истории из файла");
         }
         try {
-            List<Defect> loadDefects = jsonDefectStorage.loadDefects();
-            defectService.getDefectFromJson(loadDefects);
+            defectService.load();
         } catch (IOException e) {
             printService.printMessage("Не удалось загрузить дефекты из файла");
         }
         try {
-            List<Feature> loadFeatures = jsonFeatureStorage.loadFeatures();
-            featureService.getFeatureFromJson(loadFeatures);
+            featureService.load();
         } catch (IOException e) {
             printService.printMessage("Не удалось загрузить фичи из файла");
         }
         try {
             List<Relation> loadRelations = jsonRelationStorage.loadRelations();
-            relationService.getRelationFromJson(loadRelations);
+            relationService.load(loadRelations);
         } catch (IOException e) {
             printService.printMessage("Не удалось загрузить связи из файла");
         }
@@ -98,7 +101,7 @@ public class Main {
         } catch (LoadRelationException message) {
             printService.printMessage("Не удалось восстановить связь задачи с фикс-дефектом из файла");
         }
-        ConsoleService consoleService = new ConsoleService(inputService, printService, taskService, relationService, storyService, defectService, featureService, modelService);
+        ConsoleService consoleService = new ConsoleService(inputService, printService, taskService, relationService, storyService, defectService, featureService);
         consoleService.run();
     }
 }

@@ -1,7 +1,12 @@
 package exception;
 
-public class RelationNotFoundException extends RuntimeException {
+public class RelationNotFoundException extends AbstractElementNotFoundException {
     public RelationNotFoundException(int id) {
-        super("Связь с Id = " + id + " не найдена");
+        super(id);
+    }
+
+    @Override
+    public String getElementName() {
+        return "Связь";
     }
 }

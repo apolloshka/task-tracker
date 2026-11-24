@@ -1,13 +1,12 @@
 package model;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-public class Story extends Element {
-    //TODO хочу сохранять вложенные в истории таски и дефекты
-    private List<Task> tasks = new ArrayList<>();
-    private List<Defect> defects = new ArrayList<>();
-    private List<Feature> features = new ArrayList<>();
+public class Story extends Element implements Relationable {
+    private final Set<Task> tasks = new HashSet<>();
+    private final Set<Defect> defects = new HashSet<>();
+    private final Set<Feature> features = new HashSet<>();
 
     public Story(String title, String description) {
         super(title, description);
@@ -15,31 +14,17 @@ public class Story extends Element {
 
     public Story() {
     }
+    //TODO default-метод интерфейса
 
-    //TODO подумать над названием и раположением
-    public void addTaskToRelation(Task task) {
-        tasks.add(task);
-    }
-
-    public List<Task> getRelatedTasks() {
+    public Set<Task> getRelatedTasks() {
         return tasks;
     }
 
-    //TODO подумать над названием и раположением
-    public void addDefectToRelation(Defect defect) {
-        defects.add(defect);
-    }
-
-    public List<Defect> getRelatedDefects() {
+    public Set<Defect> getRelatedDefects() {
         return defects;
     }
 
-    //TODO подумать над названием и раположением
-    public void addFeatureToRelation(Feature feature) {
-        features.add(feature);
-    }
-
-    public List<Feature> getRelatedFeatures() {
+    public Set<Feature> getRelatedFeatures() {
         return features;
     }
 }
