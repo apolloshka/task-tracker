@@ -14,7 +14,7 @@ import java.util.List;
 public class RelationService {
     private int id = 1;
     public final List<Relation> relations;
-    private JsonRelationStorage jsonRelationStorage;
+    private final JsonRelationStorage jsonRelationStorage;
 
     public RelationService(JsonRelationStorage jsonRelationStorage) {
         relations = new ArrayList<>();
@@ -22,7 +22,7 @@ public class RelationService {
     }
 
     public List<RelationTypeEnum> getRelationType() {
-        return Arrays.asList(RelationTypeEnum.values()); //изучить
+        return Arrays.asList(RelationTypeEnum.values());
     }
 
     public List<Relation> getRelations() {

@@ -5,7 +5,6 @@ import model.Element;
 import java.io.IOException;
 import java.util.List;
 
-//TODO можно использовать этот интерфейс также для добавления/изменения и переименовать его
 public interface OperationsService<T extends Element> {
     List<T> getAll();
 
