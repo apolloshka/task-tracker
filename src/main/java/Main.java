@@ -28,13 +28,12 @@ public class Main {
         JsonStorage<Feature> jsonFeatureStorage = new JsonStorage<>(mapper, "features.json", new TypeReference<List<Feature>>() {
         });
         JsonRelationStorage jsonRelationStorage = new JsonRelationStorage(mapper);
-        TaskService taskService = new TaskService(jsonTaskStorage);
-        StoryService storyService = new StoryService(jsonStoryStorage);
-        DefectService defectService = new DefectService(jsonDefectStorage);
         RelationService relationService = new RelationService(jsonRelationStorage);
-//        FeatureService featureService = new FeatureService(jsonFeatureStorage);
+        UniversalModelService<Task> taskService = new UniversalModelService<>(jsonTaskStorage);
+        UniversalModelService<Story> storyService = new UniversalModelService<>(jsonStoryStorage);
+        UniversalModelService<Defect> defectService = new UniversalModelService<>(jsonDefectStorage);
         UniversalModelService<Feature> featureService = new UniversalModelService<>(jsonFeatureStorage);
-        PrintService printService = new PrintService(relationService, storyService, taskService);
+        PrintService printService = new PrintService(relationService);
         try {
             taskService.load();
         } catch (IOException e) {
@@ -87,7 +86,7 @@ public class Main {
             printService.printMessage("Не удалось восстановить связь блокирующей и блокируемой задач из файла");
         }
         try {
-            relationService.restoreRelatedTaskRelations(taskService, taskService);
+            relationService.restoreRelatedToTaskRelations(taskService, taskService);
         } catch (LoadRelationException message) {
             printService.printMessage("Не удалось восстановить связь двух задач из файла");
         }

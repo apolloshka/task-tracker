@@ -130,90 +130,90 @@ public class RelationService {
     }
 
     //TODO объединить методы рестора связей
-    public void restoreFeatureStoryRelations(UniversalModelService<Feature> featureService, StoryService storyService) {
+    public void restoreFeatureStoryRelations(UniversalModelService<Feature> featureService, UniversalModelService<Story> storyService) {
         for (Relation relation : relations) {
             if (relation.getType() == RelationTypeEnum.FEATURE_STORY) {
                 Feature feature = featureService.findById(relation.getMainId());
                 Story story = storyService.findById(relation.getSubordinateId());
-                feature.addRelatedElement(story);
+                feature.addRelatedElement(feature.getRelatedStories(), story);
                 story.addRelatedElement(story.getRelatedFeatures(), feature);
             }
         }
     }
 
-    public void restoreStoryTaskRelations(StoryService storyService, TaskService taskService) {
+    public void restoreStoryTaskRelations(UniversalModelService<Story> storyService, UniversalModelService<Task> taskService) {
         for (Relation relation : relations) {
             if (relation.getType() == RelationTypeEnum.STORY_TASK) {
                 Story story = storyService.findById(relation.getMainId());
                 Task task = taskService.findById(relation.getSubordinateId());
                 story.addRelatedElement(story.getRelatedTasks(), task);
-                task.addStoryToRelation(story);
+                task.addRelatedElement(task.getRelatedStories(), story);
             }
         }
     }
 
-    public void restoreStoryDefectRelations(StoryService storyService, DefectService defectService) {
+    public void restoreStoryDefectRelations(UniversalModelService<Story> storyService, UniversalModelService<Defect> defectService) {
         for (Relation relation : relations) {
             if (relation.getType() == RelationTypeEnum.STORY_DEFECT) {
                 Story story = storyService.findById(relation.getMainId());
                 Defect defect = defectService.findById(relation.getSubordinateId());
                 story.addRelatedElement(story.getRelatedDefects(), defect);
-                defect.getRelatedStories().add(story);
+                defect.addRelatedElement(defect.getRelatedStories(), story);
             }
         }
     }
 
-    public void restoreParentTaskRelations(TaskService taskServiceMain, TaskService taskServiceSub) {
+    public void restoreParentTaskRelations(UniversalModelService<Task> taskServiceMain, UniversalModelService<Task> taskServiceSub) {
         for (Relation relation : relations) {
             if (relation.getType() == RelationTypeEnum.PARENT_TASK) {
                 Task taskMain = taskServiceMain.findById(relation.getMainId());
                 Task taskSub = taskServiceSub.findById(relation.getSubordinateId());
-                taskMain.addTaskToRelation(taskSub);
-                taskSub.addTaskToRelation(taskMain);
+                taskMain.addRelatedElement(taskMain.getRelatedTasks(), taskSub);
+                taskSub.addRelatedElement(taskSub.getRelatedTasks(), taskMain);
             }
         }
     }
 
-    public void restoreBlockTaskRelations(TaskService taskServiceMain, TaskService taskServiceSub) {
+    public void restoreBlockTaskRelations(UniversalModelService<Task> taskServiceMain, UniversalModelService<Task> taskServiceSub) {
         for (Relation relation : relations) {
             if (relation.getType() == RelationTypeEnum.BLOCKS) {
                 Task taskMain = taskServiceMain.findById(relation.getMainId());
                 Task taskSub = taskServiceSub.findById(relation.getSubordinateId());
-                taskMain.addTaskToRelation(taskSub);
-                taskSub.addTaskToRelation(taskMain);
+                taskMain.addRelatedElement(taskMain.getRelatedTasks(), taskSub);
+                taskSub.addRelatedElement(taskSub.getRelatedTasks(), taskMain);
             }
         }
     }
 
-    public void restoreRelatedTaskRelations(TaskService taskServiceMain, TaskService taskServiceSub) {
+    public void restoreRelatedToTaskRelations(UniversalModelService<Task> taskServiceMain, UniversalModelService<Task> taskServiceSub) {
         for (Relation relation : relations) {
             if (relation.getType() == RelationTypeEnum.RELATED_TO) {
                 Task taskMain = taskServiceMain.findById(relation.getMainId());
                 Task taskSub = taskServiceSub.findById(relation.getSubordinateId());
-                taskMain.addTaskToRelation(taskSub);
-                taskSub.addTaskToRelation(taskMain);
+                taskMain.addRelatedElement(taskMain.getRelatedTasks(), taskSub);
+                taskSub.addRelatedElement(taskSub.getRelatedTasks(), taskMain);
             }
         }
     }
 
-    public void restoreRelatedTaskRelations(TaskService taskService, DefectService defectService) {
+    public void restoreRelatedTaskRelations(UniversalModelService<Task> taskService, UniversalModelService<Defect> defectService) {
         for (Relation relation : relations) {
             if (relation.getType() == RelationTypeEnum.DEFECT_FOUND) {
                 Task task = taskService.findById(relation.getMainId());
                 Defect defect = defectService.findById(relation.getSubordinateId());
-                task.addDefectToRelation(defect);
-                defect.getRelatedTasks().add(task);
+                task.addRelatedElement(task.getRelatedDefects(), defect);
+                defect.addRelatedElement(defect.getRelatedTasks(), task);
             }
         }
     }
 
-    public void restoreFixesTaskRelations(TaskService taskService, DefectService defectService) {
+    public void restoreFixesTaskRelations(UniversalModelService<Task> taskService, UniversalModelService<Defect> defectService) {
         for (Relation relation : relations) {
             if (relation.getType() == RelationTypeEnum.FIXES_DEFECT) {
                 Task task = taskService.findById(relation.getMainId());
                 Defect defect = defectService.findById(relation.getSubordinateId());
-                task.addDefectToRelation(defect);
-                defect.getRelatedTasks().add(task);
+                task.addRelatedElement(task.getRelatedDefects(), defect);
+                defect.addRelatedElement(defect.getRelatedTasks(), task);
             }
         }
     }

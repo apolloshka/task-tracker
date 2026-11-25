@@ -5,16 +5,17 @@ import model.*;
 
 import java.util.List;
 
+import static constants.ElementName.*;
 import static constants.UpdateElement.*;
 
-//TODO излишне много методов принта одной модели можно удалить часть
 public class PrintService {
     private final RelationService relationService;
 
-    public PrintService(RelationService relationService, StoryService storyService, TaskService taskService) {
+    public PrintService(RelationService relationService) {
         this.relationService = relationService;
     }
 
+    //TODO как объединить меню? Падежи разные. Отдельный файл?
     public void printMenu() {
         System.out.println("0 - Выход из приложения");
         System.out.println("1 - Работа с задачами");
@@ -100,111 +101,30 @@ public class PrintService {
         System.out.println(SUB + " - id зависимого элемента");
     }
 
-    public void printTask(Task task) {
-        System.out.println("Id задачи: " + task.getId()
-                + " Название: " + task.getTitle()
-                + " Описание задачи: " + task.getDescription()
-        );
-        System.out.println("Связанные дефекты:");
-        for (Defect defect : task.getRelatedDefects()) {
-            printDefectShort(defect);
-        }
-        System.out.println("Связанные задачи:");
-        for (Task tasks : task.getRelatedTasks()) {
-            printTaskShort(tasks);
-        }
-        System.out.println("Связанные истории:");
-        for (Story story : task.getRelatedStories()) {
-            printStoryShort(story);
-        }
-    }
-
-    private void printTaskShort(Task task) {
+    public void printRelatedElement(Element element, String type, Relation relation) {
         System.out.println(
-                "Id задачи: " + task.getId()
-                        + " Название: " + task.getTitle()
-        );
+                "Id " + type + ": " + element.getId()
+                        + " Название: " + element.getTitle()
+                        + " Тип связи: " + relation.getType());
     }
 
-    public void printStory(Story story) {
-        System.out.println("Id истории: " + story.getId()
-                + " Название: " + story.getTitle()
-                + " Описание истории: " + story.getDescription()
-        );
-        System.out.println("Связанные дефекты:");
-        for (Defect defect : story.getRelatedDefects()) {
-            printDefectShort(defect);
-        }
-        System.out.println("Связанные задачи:");
-        for (Task task : story.getRelatedTasks()) {
-            printTaskShort(task);
-        }
-        System.out.println("Связанные фичи:");
-        for (Feature feature : story.getRelatedFeatures()) {
-            printFeatureShort(feature);
-        }
-    }
-
-    private void printStoryShort(Story story) {
-        System.out.println("Id истории: " + story.getId()
-                + " Название: " + story.getTitle()
-        );
-    }
-
-    public void printDefect(Defect defect) {
-        System.out.println("Id дефекта: " + defect.getId()
-                + " Название: " + defect.getTitle()
-                + " Описание дефекта: " + defect.getDescription()
-        );
-        System.out.println("Связанные задачи:");
-        for (Task task : defect.getRelatedTasks().getAll()) {
-            printTaskShort(task);
-        }
-        System.out.println("Связанные истории:");
-        for (Story story : defect.getRelatedStories().getAll()) {
-            printStoryShort(story);
-        }
-    }
-
-    private void printDefectShort(Defect defect) {
-        System.out.println(
-                "Id дефекта: " + defect.getId()
-                        + " Название: " + defect.getTitle()
-        );
-    }
-
-    public void printFeature(Feature feature) {
-        System.out.println("Id фичи: " + feature.getId()
-                + " Название: " + feature.getTitle()
-                + " Описание фичи: " + feature.getDescription()
-        );
-        System.out.println("Связанные истории:");
-        for (Story story : feature.getRelatedStories()) {
-            printStoryShort(story);
-        }
-    }
-
-    public void printFeatureWithRelations(Feature feature, List<Relation> relations) {
+    public void printFeature(Feature feature, List<Relation> relations) {
         System.out.println("Id фичи: " + feature.getId()
                 + " Название: " + feature.getTitle());
-        System.out.println("Связанные истории:");
+        printRelationType(STORY);
         for (Relation relation : relations) {
             for (Story story : feature.getRelatedStories()) {
                 if (story.getId() == relation.getSubordinateId()) {
-                    System.out.println(
-                            "Id истории: " + story.getId()
-                                    + " Название: " + story.getTitle()
-                                    + " Тип связи: " + relation.getType()
-                    );
+                    printRelatedElement(story, STORY, relation);
                 }
             }
         }
     }
 
-    public void printTaskWithRelations(Task task, List<Relation> relations) {
+    public void printTask(Task task, List<Relation> relations) {
         System.out.println("Id задачи: " + task.getId()
                 + " Название: " + task.getTitle());
-        System.out.println("Связанные задачи:");
+        printRelationType(TASK);
         for (Relation relation : relations) {
             for (Task relatedTask : task.getRelatedTasks()) {
                 if ((relation.getType() == RelationTypeEnum.PARENT_TASK
@@ -214,128 +134,99 @@ public class PrintService {
                         && relation.getSubordinateId() == relatedTask.getId())
                         || (relation.getSubordinateId() == task.getId()
                         && relation.getMainId() == relatedTask.getId()))) {
-                    System.out.println(
-                            "Id задачи: " + relatedTask.getId()
-                                    + " Название: " + relatedTask.getTitle()
-                                    + " Тип связи: " + relation.getType()
-                    );
+                    printRelatedElement(relatedTask, TASK, relation);
                 }
             }
         }
-        System.out.println("Связанные истории:");
+        printRelationType(STORY);
         for (Relation relation : relations) {
             for (Story story : task.getRelatedStories()) {
                 if (relation.getType() == RelationTypeEnum.STORY_TASK
                         && relation.getMainId() == story.getId()
                         && relation.getSubordinateId() == task.getId()) {
-                    System.out.println(
-                            "Id истории: " + story.getId()
-                                    + " Название: " + story.getTitle()
-                                    + " Тип связи: " + relation.getType()
-                    );
+                    printRelatedElement(story, STORY, relation);
                 }
             }
         }
-        System.out.println("Связанные дефекты:");
+        printRelationType(DEFECTS);
         for (Relation relation : relations) {
             for (Defect defect : task.getRelatedDefects()) {
                 if ((relation.getType() == RelationTypeEnum.DEFECT_FOUND
                         || relation.getType() == RelationTypeEnum.FIXES_DEFECT)
                         && relation.getMainId() == task.getId()
                         && relation.getSubordinateId() == defect.getId()) {
-                    System.out.println(
-                            "Id дефекта: " + defect.getId()
-                                    + " Название: " + defect.getTitle()
-                                    + " Тип связи: " + relation.getType()
-                    );
+                    printRelatedElement(defect, DEFECT, relation);
                 }
             }
         }
     }
 
-    public void printStoryWithRelations(Story story, List<Relation> relations) {
+    public void printStory(Story story, List<Relation> relations) {
         System.out.println("Id истории: " + story.getId()
                 + " Название: " + story.getTitle()
                 + " Описание: " + story.getDescription());
-        System.out.println("Связанные фичи:");
+        printRelationType(FEATURE);
         for (Relation relation : relations) {
             for (Feature feature : story.getRelatedFeatures()) {
                 if (relation.getType() == RelationTypeEnum.FEATURE_STORY
                         && relation.getMainId() == feature.getId()
                         && relation.getSubordinateId() == story.getId()) {
-                    System.out.println("Id фичи: " + feature.getId()
-                            + " Название: " + feature.getTitle()
-                            + " Тип связи: " + relation.getType());
+                    printRelatedElement(feature, FEATURE, relation);
                 }
             }
         }
-        System.out.println("Связанные задачи:");
+        printRelationType(TASK);
         for (Relation relation : relations) {
             for (Task task : story.getRelatedTasks()) {
                 if (relation.getType() == RelationTypeEnum.STORY_TASK
                         && relation.getMainId() == story.getId()
                         && relation.getSubordinateId() == task.getId()) {
-                    System.out.println("Id задачи: " + task.getId()
-                            + " Название: " + task.getTitle()
-                            + " Тип связи: " + relation.getType());
+                    printRelatedElement(task, TASK, relation);
                 }
             }
         }
-        System.out.println("Связанные дефекты:");
+        //TODO можно ли помимо констрант создать файл-словарь для склонений?
+        printRelationType(DEFECTS);
         for (Relation relation : relations) {
             for (Defect defect : story.getRelatedDefects()) {
                 if (relation.getType() == RelationTypeEnum.STORY_DEFECT
                         && relation.getMainId() == story.getId()
                         && relation.getSubordinateId() == defect.getId()) {
-                    System.out.println("Id дефекта: " + defect.getId()
-                            + " Название: " + defect.getTitle()
-                            + " Тип связи: " + relation.getType());
+                    printRelatedElement(defect, DEFECT, relation);
                 }
             }
         }
     }
 
-    public void printDefectWithRelations(
-            Defect defect,
-            List<Relation> relations) {
+    public void printDefect(Defect defect, List<Relation> relations) {
         System.out.println("Id дефекта: " + defect.getId()
                 + " Название: " + defect.getTitle());
-        System.out.println("Связанные задачи:");
+        printRelationType(TASK);
         for (Relation relation : relations) {
-            for (Task task : defect.getRelatedTasks().getAll()) {
+            for (Task task : defect.getRelatedTasks()) {
                 if ((relation.getType() == RelationTypeEnum.DEFECT_FOUND
                         || relation.getType() == RelationTypeEnum.FIXES_DEFECT)
                         && relation.getMainId() == task.getId()
                         && relation.getSubordinateId() == defect.getId()) {
-                    System.out.println(
-                            "Id задачи: " + task.getId()
-                                    + " Название: " + task.getTitle()
-                                    + " Тип связи: " + relation.getType()
-                    );
+                    printRelatedElement(task, TASK, relation);
                 }
             }
         }
-        System.out.println("Связанные истории:");
+
+        printRelationType(STORY);
         for (Relation relation : relations) {
-            for (Story story : defect.getRelatedStories().getAll()) {
+            for (Story story : defect.getRelatedStories()) {
                 if (relation.getType() == RelationTypeEnum.STORY_DEFECT
                         && relation.getMainId() == story.getId()
                         && relation.getSubordinateId() == defect.getId()) {
-                    System.out.println(
-                            "Id истории: " + story.getId()
-                                    + " Название: " + story.getTitle()
-                                    + " Тип связи: " + relation.getType()
-                    );
+                    printRelatedElement(story, STORY, relation);
                 }
             }
         }
     }
 
-    private void printFeatureShort(Feature feature) {
-        System.out.println(
-                "Id фичи: " + feature.getId()
-                        + " Название: " + feature.getTitle()
-        );
+    private void printRelationType(String type) {
+        System.out.println("Связанные " + type + ":");
     }
 
     public void printRelationTypes(List<RelationTypeEnum> types) {
@@ -347,7 +238,7 @@ public class PrintService {
         System.out.println("Тип связи: ");
     }
 
-    public void printRelation(Relation relation) {
+    public void printRelatedElement(Relation relation) {
         System.out.println("Id связи: " + relation.getId()
                 + " Тип связи: " + relation.getType()
                 + " id основного элемента: " + relation.getMainId()
@@ -362,7 +253,7 @@ public class PrintService {
         }
         System.out.println("Найденные задачи:");
         for (Task task : tasks) {
-            printTaskWithRelations(task, relationService.findTaskRelations(task));
+            printTask(task, relationService.findTaskRelations(task));
         }
     }
 
@@ -373,7 +264,7 @@ public class PrintService {
         }
         System.out.println("Найденные истории:");
         for (Story story : stories) {
-            printStoryWithRelations(story, relationService.findStoryRelations(story));
+            printStory(story, relationService.findStoryRelations(story));
         }
     }
 
@@ -384,7 +275,7 @@ public class PrintService {
         }
         System.out.println("Найденные дефекты:");
         for (Defect defect : defects) {
-            printDefectWithRelations(defect, relationService.findDefectRelations(defect));
+            printDefect(defect, relationService.findDefectRelations(defect));
         }
     }
 
@@ -395,7 +286,7 @@ public class PrintService {
         }
         System.out.println("Найденные фичи:");
         for (Feature feature : features) {
-            printFeatureWithRelations(feature, relationService.findFeatureRelations(feature));
+            printFeature(feature, relationService.findFeatureRelations(feature));
         }
     }
 
@@ -406,7 +297,7 @@ public class PrintService {
         }
         System.out.println("Найденные связи:");
         for (Relation relation : relations) {
-            printRelation(relation);
+            printRelatedElement(relation);
         }
     }
 

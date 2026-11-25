@@ -1,8 +1,11 @@
 package model;
 
-public class Defect extends Element {
-    private final RelatedElements<Task> tasks = new RelatedElements<>();
-    private final RelatedElements<Story> stories = new RelatedElements<>();
+import java.util.HashSet;
+import java.util.Set;
+
+public class Defect extends Element implements Relationable {
+    private final Set<Task> tasks = new HashSet<>();
+    private final Set<Story> stories = new HashSet<>();
 
     public Defect(String title, String description) {
         super(title, description);
@@ -11,11 +14,11 @@ public class Defect extends Element {
     public Defect() {
     }
 
-    public RelatedElements<Task> getRelatedTasks() {
+    public Set<Task> getRelatedTasks() {
         return tasks;
     }
 
-    public RelatedElements<Story> getRelatedStories() {
+    public Set<Story> getRelatedStories() {
         return stories;
     }
 }

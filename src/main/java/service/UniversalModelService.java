@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class UniversalModelService<T extends Element> implements DeleteService<T> {
+public class UniversalModelService<T extends Element> implements OperationsService<T> {
     private final List<T> elements = new ArrayList<>();
     private int id = 1;
     private static final ResourceBundle messages = ResourceBundle.getBundle("messages");
