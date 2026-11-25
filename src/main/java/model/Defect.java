@@ -1,12 +1,11 @@
 package model;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-public class Defect extends Element {
-
-    private List<Task> tasks = new ArrayList<>();
-    private List<Story> stories = new ArrayList<>();
+public class Defect extends Element implements Relationable {
+    private final Set<Task> tasks = new HashSet<>();
+    private final Set<Story> stories = new HashSet<>();
 
     public Defect(String title, String description) {
         super(title, description);
@@ -15,21 +14,11 @@ public class Defect extends Element {
     public Defect() {
     }
 
-    //TODO подумать над названием и раположением
-    public void addTaskToRelation(Task task) {
-        tasks.add(task);
-    }
-
-    public List<Task> getRelatedTasks() {
+    public Set<Task> getRelatedTasks() {
         return tasks;
     }
 
-    //TODO подумать над названием и раположением
-    public void addStoryToRelation(Story story) {
-        stories.add(story);
-    }
-
-    public List<Story> getRelatedStories() {
+    public Set<Story> getRelatedStories() {
         return stories;
     }
 }

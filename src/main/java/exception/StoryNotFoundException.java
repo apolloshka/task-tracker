@@ -1,8 +1,12 @@
 package exception;
 
-public class StoryNotFoundException extends RuntimeException {
+public class StoryNotFoundException extends AbstractElementNotFoundException {
     public StoryNotFoundException(int id) {
-        super("История с Id = " + id + " не найдена");
+        super(id);
     }
 
+    @Override
+    public String getElementName() {
+        return "История";
+    }
 }

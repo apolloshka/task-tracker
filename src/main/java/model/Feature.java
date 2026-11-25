@@ -1,26 +1,19 @@
 package model;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-public class Feature extends Element {
-
-    private List<Story> stories = new ArrayList<>();
+public class Feature extends Element implements Relationable {
+    private final Set<Story> stories = new HashSet<>();
 
     public Feature(String title, String description) {
         super(title, description);
-        this.stories = stories;
     }
 
     public Feature() {
     }
 
-    //TODO подумать над названием и раположением
-    public void addStoryToRelation(Story story) {
-        stories.add(story);
-    }
-
-    public List<Story> getRelatedStories() {
+    public Set<Story> getRelatedStories() {
         return stories;
     }
 }

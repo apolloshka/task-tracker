@@ -1,8 +1,12 @@
 package exception;
 
-public class TaskNotFoundException extends RuntimeException {
+public class TaskNotFoundException extends AbstractElementNotFoundException {
+    public TaskNotFoundException(int id) {
+        super(id);
+    }
 
-    public TaskNotFoundException(int id){
-        super("Задача с Id = " + id + " не найдена");
+    @Override
+    public String getElementName() {
+        return "Задача";
     }
 }

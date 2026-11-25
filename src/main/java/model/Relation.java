@@ -2,14 +2,10 @@ package model;
 
 import enums.RelationTypeEnum;
 
-import java.util.List;
-
 public class Relation {
     private int id;
     private RelationTypeEnum type;
-
     //TODO подумать над названиями полей
-
     private int mainId;
     private int subordinateId;
 
@@ -30,7 +26,6 @@ public class Relation {
         this.id = id;
     }
 
-
     public RelationTypeEnum getType() {
         return type;
     }
@@ -43,5 +38,11 @@ public class Relation {
         return subordinateId;
     }
 
-    //TODO можем ли мы менять связь? от этого зависит нужны ли setterы
+    public void setMainId(int mainId) {
+        this.mainId = mainId;
+    }
+
+    public void setSubordinateId(int subordinateId) {
+        this.subordinateId = subordinateId;
+    }
 }

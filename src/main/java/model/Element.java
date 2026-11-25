@@ -1,7 +1,6 @@
 package model;
 
-import java.util.List;
-
+import java.util.Collection;
 
 public abstract class Element {
     private int id;
@@ -14,6 +13,11 @@ public abstract class Element {
     }
 
     public Element() {
+    }
+
+    //TODO обобшенный метод родительского класса - для разных типов
+    protected <T extends Element> void addRelateElement(Collection<T> collection, T element) {
+        collection.add(element);
     }
 
     public int getId() {

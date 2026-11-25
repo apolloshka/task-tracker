@@ -9,11 +9,9 @@ import java.io.IOException;
 import java.util.List;
 
 public class JsonRelationStorage {
-
     private ObjectMapper mapper;
 
     public JsonRelationStorage(ObjectMapper mapper) {
-
         this.mapper = mapper;
     }
 
