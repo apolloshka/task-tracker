@@ -16,9 +16,7 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         InputService inputService = new InputService(scanner);
         ObjectMapper mapper = new ObjectMapper();
-        mapper.enable(SerializationFeature.INDENT_OUTPUT); //настройка mapper'а
-        //TODO применима ли тут какая-нибудь ленивая инициализация? где должны создаваться эти объекты (не main?)
-        ModelService modelService = new ModelService();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
         JsonStorage<Task> jsonTaskStorage = new JsonStorage<>(mapper, "tasks.json", new TypeReference<List<Task>>() {
         });
         JsonStorage<Story> jsonStoryStorage = new JsonStorage<>(mapper, "stories.json", new TypeReference<List<Story>>() {

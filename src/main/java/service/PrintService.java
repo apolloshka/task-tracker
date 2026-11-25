@@ -185,7 +185,7 @@ public class PrintService {
                 }
             }
         }
-        //TODO можно ли помимо констрант создать файл-словарь для склонений?
+        //TODO можно ли помимо констант создать файл-словарь для склонений?
         printRelationType(DEFECTS);
         for (Relation relation : relations) {
             for (Defect defect : story.getRelatedDefects()) {
@@ -212,7 +212,6 @@ public class PrintService {
                 }
             }
         }
-
         printRelationType(STORY);
         for (Relation relation : relations) {
             for (Story story : defect.getRelatedStories()) {
